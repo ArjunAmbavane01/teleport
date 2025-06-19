@@ -8,7 +8,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:generate": "prisma generate --no-engine",
-    "db:migrate": "prisma migrate dev"
+    "db:migrate": "prisma migrate dev",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -18,10 +19,10 @@
   "devDependencies": {
     "@types/node": "^20",
     "@workspace/typescript-config": "workspace:*",
-    "prisma": "^6.10.1",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "prisma": "^6.10.1",
     "@prisma/client": "6.10.1"
   }
 }
