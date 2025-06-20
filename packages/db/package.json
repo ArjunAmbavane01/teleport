@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:generate": "prisma generate --no-engine",
     "db:migrate": "prisma migrate dev",
-    "postinstall": "prisma generate"
+    "postinstall": "pnpm run db:generate"
   },
   "keywords": [],
   "author": "",

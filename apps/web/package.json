@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.9.1",
     "@prisma/client": "^6.10.1",
     "@workspace/db": "workspace:*",
     "@workspace/ui": "workspace:*",
@@ -26,7 +27,7 @@
     "react-icons": "^5.5.0"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/node": "^20.17.19",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@workspace/eslint-config": "workspace:^",
