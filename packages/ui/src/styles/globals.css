@@ -125,3 +125,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@theme {
+  --breakpoint-xs: 500px;
+  --breakpoint-tab: 900px;
+  --breakpoint-8xl: 1500px;
+
+  --spacing-xs: 500px;
+  --spacing-tab: 900px;
+  --spacing-8xl: 1500px;
+}

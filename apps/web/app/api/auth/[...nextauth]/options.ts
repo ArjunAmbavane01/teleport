@@ -1,12 +1,12 @@
-import NextAuth, { NextAuthConfig } from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import Google from "next-auth/providers/google"
 import prisma from "@workspace/db/client";
+import NextAuth, { NextAuthConfig } from "next-auth"
+import Google from "next-auth/providers/google"
+import { PrismaAdapter } from "@auth/prisma-adapter"
 import { PrismaClient } from "@prisma/client";
 
 const config: NextAuthConfig = {
     adapter: PrismaAdapter(prisma as PrismaClient),
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET!,
     session: {
         strategy: "jwt",
         maxAge: 30 * 24 * 60 * 60, // 30 days in seconds

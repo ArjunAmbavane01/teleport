@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 const SignInButton = () => {
     const router = useRouter();
     return (
-        <Button onClick={() => router.push('/auth/sign-in')}>Sign In</Button>
+        <Button className="p-1 bg-white" onClick={() => router.push('/auth/sign-in')}>Sign In</Button>
     )
 }
 
