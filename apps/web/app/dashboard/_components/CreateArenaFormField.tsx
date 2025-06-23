@@ -1,9 +1,9 @@
+import { FocusEventHandler, } from 'react';
 import { Input } from '@workspace/ui/components/input';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
-import { CreateArenaInput, ArenaRegionsEnum } from '@workspace/common/schemas/arena.schema';
+import { CreateArenaInput } from '@workspace/common/schemas/arena.schema';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
-import { Control, FieldPath, useForm } from "react-hook-form";
-import { FocusEvent, FocusEventHandler, useState } from 'react';
+import { Control, FieldPath } from "react-hook-form";
 
 interface CreateArenaFormFieldProps {
     name: FieldPath<CreateArenaInput>,

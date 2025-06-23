@@ -8,18 +8,22 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String?
-  email         String          @unique
+  email         String        @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
- 
+  arenas        Arena[]       @relation("ArenaUsers") // user is part of these arenas
+  adminArenas   Arena[]       @relation("ArenaAdmin") // user is admin of these arenas
+  chatGroups    ChatGroup[]   @relation("ChatGroupUsers") // user is part of these chat groups
+  sentMessages  ChatMessage[] @relation("SentMessages") // user has sent these messages
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
- 
+
 model Account {
   userId            String
   type              String
@@ -32,21 +36,67 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
- 
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@id([provider, providerAccountId])
 }
- 
+
 model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Arena {
+  id         Int           @id @default(autoincrement())
+  slug       String        @unique
+  name       String
+  adminId    String
+  messages   ChatMessage[] // all messages of this arena
+  chatGroups ChatGroup[] // all chat groups of this arena
+  users      User[]        @relation("ArenaUsers") // all users if this arena
+
+  created_at DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  admin User @relation("ArenaAdmin", fields: [adminId], references: [id]) // admin
+}
+
+enum ChatGroupType {
+  dm
+  zone
+}
+
+model ChatGroup {
+  id       String        @id @unique // usera-userb for dm
+  arenaId  Int
+  type     ChatGroupType // dm or zone
+  messages ChatMessage[] // messages of this group
+  users    User[]        @relation("ChatGroupUsers") // users of this group
+  arena    Arena         @relation(fields: [arenaId], references: [id]) // arena it belongs to
+
+  createdAt DateTime @default(now())
+}
+
+model ChatMessage {
+  id       Int    @id @default(autoincrement())
+  content  String
+  senderId String
+  groupId  String
+  arenaId  Int
+
+  created_at DateTime @default(now())
+
+  user  User      @relation("SentMessages", fields: [senderId], references: [id])
+  arena Arena     @relation(fields: [arenaId], references: [id])
+  group ChatGroup @relation(fields: [groupId], references: [id])
 }
