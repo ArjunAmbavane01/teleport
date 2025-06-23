@@ -1,0 +1,23 @@
+{
+  "name": "@workspace/common",
+  "version": "1.0.0",
+  "main": "index.js",
+  "exports":{
+    "./schemas/*":"./src/schemas/*.ts",
+    "./types/*":"./src/types/*.ts"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "description": "",
+  "devDependencies": {
+    "@workspace/typescript-config": "workspace:*"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
+  }
+}

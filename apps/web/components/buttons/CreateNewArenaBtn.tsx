@@ -20,27 +20,26 @@ const CreateNewArenaBtn: React.FC<CreateNewArenaBtnProps> = ({ session }: Create
     const { id: userId } = session.user;
     const createNewArena = async () => {
         setLoading(c => !c);
-        setTimeout(() => {
-            setLoading(c => !c);
-        }, 4000)
+        setTimeout(()=>setLoading(false),4000);
         // const response = await axios.post('/api/arena/createArena', {
         //     userId
         // });
         // const { type, message, data } = response.data;
         // if (type === "error") {
-        //     setLoading(c => !c);
+            
         // }
+        // setLoading(c => !c);
     }
 
     return (
-        <Button className="bg-white p-2 w-32" onClick={createNewArena}>{
+        <Button className="bg-white p-2 w-full" onClick={createNewArena}>{
             loading ? (
                 <>
                     Creating <CgSpinner className="animate-spin" />
                 </>
             ) : (
                 <>
-                    New Arena <PlusCircle className="size-3" />
+                    Create Arena
                 </>
             )
         }</Button>
