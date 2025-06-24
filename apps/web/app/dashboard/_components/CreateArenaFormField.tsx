@@ -13,7 +13,7 @@ interface CreateArenaFormFieldProps {
     inputType?: string,
     selectItems?: string[],
     onFocus?: FocusEventHandler<HTMLInputElement>
-    formControl: Control<CreateArenaInput, any>,
+    formControl: Control<CreateArenaInput>,
 }
 
 export const CreateArenaFormField: React.FC<CreateArenaFormFieldProps> = ({ name, label, placeholder, description, inputType, selectItems, onFocus, formControl }: CreateArenaFormFieldProps) => {

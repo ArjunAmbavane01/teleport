@@ -20,15 +20,16 @@ const CreateArenaForm: React.FC<CreateArenaFormProps> = ({ session }: CreateAren
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const router = useRouter();
 
-    if (!session || !session.user) return;
     const form = useForm<CreateArenaInput>({
         resolver: zodResolver(createArenaSchema),
         defaultValues: {
             arenaName: "Untitled",
             arenaRegion: "office",
-            adminId: session.user.id,
+            adminId: session?.user?.id || "",
         }
     });
+
+    if (!session || !session.user) return;
 
     const createNewArena = async (values: CreateArenaInput) => {
         setIsSubmitting(true);

@@ -14,6 +14,12 @@
       "outputs": [
         ".next/**",
         "!.next/cache/**"
+      ],
+      "env": [
+        "NEXTAUTH_SECRET",
+        "AUTH_GOOGLE_ID",
+        "AUTH_GOOGLE_SECRET",
+        "DATABASE_URL"
       ]
     },
     "lint": {
@@ -31,7 +37,13 @@
         "^db:generate"
       ],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": [
+        "NEXTAUTH_SECRET",
+        "AUTH_GOOGLE_ID",
+        "AUTH_GOOGLE_SECRET",
+        "DATABASE_URL"
+      ]
     },
     "db:generate": {
       "cache": false
