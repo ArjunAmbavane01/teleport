@@ -1,8 +1,7 @@
-import prisma from "@workspace/db/client";
-import NextAuth, { NextAuthConfig } from "next-auth"
+import { prisma, PrismaClient } from "@workspace/db";
+import { PrismaAdapter } from "@workspace/db/adapter";
+import NextAuth, { NextAuthConfig, NextAuthResult } from "next-auth"
 import Google from "next-auth/providers/google"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { PrismaClient } from "@prisma/client";
 
 const config: NextAuthConfig = {
     adapter: PrismaAdapter(prisma as PrismaClient),
@@ -43,4 +42,8 @@ const config: NextAuthConfig = {
     },
 }
 
-export const { handlers, signIn, signOut, auth } = NextAuth(config);
+export const result = NextAuth(config);
+export const handlers: NextAuthResult['handlers'] = result.handlers;
+export const auth: NextAuthResult['auth'] = result.auth;
+export const signIn: NextAuthResult['signIn'] = result.signIn;
+export const signOut: NextAuthResult['signOut'] = result.signOut;

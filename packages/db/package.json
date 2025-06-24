@@ -1,15 +1,16 @@
 {
   "name": "@workspace/db",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.ts",
   "exports": {
-    "./client": "./src/db.config.ts"
+    ".": "./src/index.ts",
+    "./adapter": "./src/adapter.ts"
   },
+  "types": "src/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "db:generate": "prisma generate --no-engine",
-    "db:migrate": "prisma migrate dev",
-    "postinstall": "pnpm run db:generate"
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev --skip-generate",
+    "db:deploy": "prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
@@ -17,12 +18,14 @@
   "type": "module",
   "description": "",
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/node": "^20.17.19",
     "@workspace/typescript-config": "workspace:*",
+    "prisma": "^6.10.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "prisma": "^6.10.1",
-    "@prisma/client": "6.10.1"
+    "@auth/prisma-adapter": "^2.9.1",
+    "@prisma/client": "^6.10.1"
   }
 }

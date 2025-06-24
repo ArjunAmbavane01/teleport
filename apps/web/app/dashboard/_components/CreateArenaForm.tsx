@@ -10,6 +10,7 @@ import { CgSpinner } from 'react-icons/cg';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { CreateArenaFormField } from './CreateArenaFormField';
+import { createArenaResponse } from '@workspace/common/schemas/apiResponse.schema';
 
 interface CreateArenaFormProps {
     session: Session | null;
@@ -18,32 +19,34 @@ interface CreateArenaFormProps {
 const CreateArenaForm: React.FC<CreateArenaFormProps> = ({ session }: CreateArenaFormProps) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const router = useRouter();
+
+    if (!session || !session.user) return;
     const form = useForm<CreateArenaInput>({
         resolver: zodResolver(createArenaSchema),
         defaultValues: {
             arenaName: "Untitled",
             arenaRegion: "office",
-            adminId: session?.user?.id,
+            adminId: session.user.id,
         }
     });
 
     const createNewArena = async (values: CreateArenaInput) => {
         setIsSubmitting(true);
-        // setTimeout(() => setIsSubmitting(false), 4000);
         try {
             const response = await axios.post('/api/arena/createArena', {
                 ...values
             });
-            const { type, message, data } = response.data;
+            const { type, message, data } = response.data as createArenaResponse;
             if (type === "error") {
                 toast.error(message, {
                     richColors: true
                 })
             } else {
+                const { arenaSlug } = data as { arenaSlug: string };
                 toast.success(message, {
                     richColors: true
                 })
-                router.push(`/arena/${data.arenaId}`);
+                router.push(`/arena/${arenaSlug}`);
             }
         } catch (e) {
             toast.error('An unexpected error occurred', {
