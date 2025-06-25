@@ -65,7 +65,7 @@ model Arena {
   chatGroups ChatGroup[] // all chat groups of this arena
   users      User[]        @relation("ArenaUsers") // all users if this arena
 
-  created_at DateTime @default(now())
+  createdAt DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   admin User @relation("ArenaAdmin", fields: [adminId], references: [id]) // admin
@@ -94,7 +94,7 @@ model ChatMessage {
   groupId  String
   arenaId  Int
 
-  created_at DateTime @default(now())
+  createdAt DateTime @default(now())
 
   user  User      @relation("SentMessages", fields: [senderId], references: [id])
   arena Arena     @relation(fields: [arenaId], references: [id])

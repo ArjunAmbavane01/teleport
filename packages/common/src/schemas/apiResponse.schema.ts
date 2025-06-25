@@ -1,13 +1,13 @@
 import { z } from 'zod/v4';
+import { arenaSchema } from './arena.schema.js';
 
-
-export const createArenaResponseSchema = z.object({
+export const getUserArenasResponseSchema = z.object({
     type: z.enum(['success', 'error']),
     message: z.string().max(100, { error: "Response message cannot be more than 100 characters" }),
     data: z.object({
-        arenaSlug: z.string().min(1, { error: "Arena slug is required" }).max(100, { error: "Arena slug cannot be more than 100 characters" }),
+        userArenas: z.array(arenaSchema)
     }).optional(),
     error: z.any().optional(),
 })
 
-export type createArenaResponse = z.infer<typeof createArenaResponseSchema>;
+export type getUserArenasResponse = z.infer<typeof getUserArenasResponseSchema>;

@@ -1,6 +1,6 @@
 "use client"
 
-import { handleSignOut } from "@/lib/auth/signOutServerAction";
+import { handleSignOut } from "@/lib/auth/signOut";
 import { Button } from "@workspace/ui/components/button"
 
 const SignOutButton = () => {
