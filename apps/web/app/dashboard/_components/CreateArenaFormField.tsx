@@ -1,19 +1,19 @@
 import { FocusEventHandler, } from 'react';
 import { Input } from '@workspace/ui/components/input';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
-import { CreateArenaInput } from '@workspace/common/schemas/arena.schema';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 import { Control, FieldPath } from "react-hook-form";
+import { CreateArenaInput } from '@workspace/common/schemas/createArena.schema';
 
 interface CreateArenaFormFieldProps {
-    name: FieldPath<CreateArenaInput>,
-    label: string,
-    placeholder: string,
-    description?: string,
-    inputType?: string,
-    selectItems?: string[],
-    onFocus?: FocusEventHandler<HTMLInputElement>
-    formControl: Control<CreateArenaInput>,
+    name: FieldPath<CreateArenaInput>;
+    label: string;
+    placeholder: string;
+    description?: string;
+    inputType?: string;
+    selectItems?: string[];
+    onFocus?: FocusEventHandler<HTMLInputElement>;
+    formControl: Control<CreateArenaInput>;
 }
 
 export const CreateArenaFormField: React.FC<CreateArenaFormFieldProps> = ({ name, label, placeholder, description, inputType, selectItems, onFocus, formControl }: CreateArenaFormFieldProps) => {

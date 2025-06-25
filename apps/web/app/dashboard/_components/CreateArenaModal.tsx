@@ -2,9 +2,7 @@ import { Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
 import CloseModalBtn from '@/components/buttons/CloseModalBtn';
 import CreateArenaForm from './CreateArenaForm';
-import { requireAuth } from '@/lib/auth/requireAuth';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
-import { User } from 'next-auth';
 
 interface CreateArenaModalProps {
     setIsCreateArenaModalOpen: Dispatch<SetStateAction<boolean>>;

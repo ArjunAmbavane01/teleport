@@ -5,10 +5,9 @@ import generateArenaSlug from "@workspace/common/utils/slug";
 import { createArenaSchema, CreateArenaInput, createArenaResponse, } from '@workspace/common/schemas/createArena.schema';
 import { auth } from "@/app/api/auth/[...nextauth]/options";
 import { revalidatePath } from "next/cache";
+import { Arena } from "@workspace/common/schemas/arena.schema";
 
 export const createNewArena = async (values: CreateArenaInput): Promise<createArenaResponse> => {
-
-    let responseData: createArenaResponse;
     try {
         const session = await auth();
         if (!session || !session.user || !session.user.id) {
@@ -52,4 +51,28 @@ export const createNewArena = async (values: CreateArenaInput): Promise<createAr
             message: 'Internal server error occurred',
         }
     }
+}
+
+export const getUserArenas = async (userId: string): Promise<Arena[]> => {
+    const userArenas: Arena[] = await prisma.arena.findMany({
+        where: {
+            OR: [
+                { adminId: userId },
+                { users: { some: { id: userId } } }
+            ]
+        }
+    });
+    return userArenas;
+}
+
+export const getArenaIdFromSlug = async (slug: string): Promise<{ id: number } | null> => {
+    const res = await prisma.arena.findUnique({
+        where: {
+            slug
+        },
+        select: {
+            id: true
+        }
+    })
+    return res;
 }

@@ -4,6 +4,6 @@ export interface Arena {
     id: string;
     name: string;
     region: ArenaRegions;
-    adminId: string
+    adminId: string;
     createdAt: Date;
 }

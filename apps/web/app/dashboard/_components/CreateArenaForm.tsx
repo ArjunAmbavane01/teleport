@@ -3,7 +3,6 @@
 import { FocusEvent, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/navigation';
-import { User } from 'next-auth';
 import { Form } from '@workspace/ui/components/form';
 import { ArenaRegionsEnum } from '@workspace/common/schemas/arena.schema';
 import { createArenaSchema, CreateArenaInput,  } from '@workspace/common/schemas/createArena.schema';

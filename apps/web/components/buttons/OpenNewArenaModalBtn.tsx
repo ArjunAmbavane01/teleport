@@ -3,7 +3,6 @@
 import CreateArenaModal from '@/app/dashboard/_components/CreateArenaModal'
 import { Button } from '@workspace/ui/components/button'
 import { PlusCircle } from 'lucide-react'
-import { User } from 'next-auth'
 import { useState } from 'react'
 
 
