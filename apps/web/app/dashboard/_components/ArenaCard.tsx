@@ -8,12 +8,13 @@ interface ArenaCardProps {
 const ArenaCard: React.FC<ArenaCardProps> = ({ arena }: ArenaCardProps) => {
     return (
         <Link href={`/arena/${arena.slug}`} prefetch={false}>
-            <div className='grid grid-rows-3 size-44 rounded bg-gray-700 border border-white'>
+            <div className='grid grid-rows-3 size-52 rounded bg-gray-700 border border-white'>
                 <div className='row-span-2'>
 
                 </div>
-                <div className='row-span-1 bg-black text-white'>
-                    {arena.name}
+                <div className='flex flex-col gap-2 row-span-1 bg-black text-white p-3'>
+                    <span> {arena.name}</span>
+                    <span>{arena.createdAt.toLocaleString()}</span>
                 </div>
             </div>
         </Link>

@@ -7,7 +7,6 @@ interface ArenaProps {
 }
 
 const Arena = ({ socket }: ArenaProps) => {
-    console.log('here')
     return (
         <div>
             Arena

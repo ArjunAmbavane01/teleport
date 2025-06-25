@@ -1,14 +1,14 @@
 {
   "name": "@workspace/common",
   "version": "1.0.0",
-  "main": "index.js",
   "exports": {
-    "./schemas/*": "./src/schemas/*.ts",
-    "./types/*": "./src/types/*.ts",
-    "./utils/*": "./src/utils/*.ts"
+    "./schemas/*": "./dist/schemas/*.js",
+    "./types/*": "./dist/types/*.js",
+    "./utils/*": "./dist/utils/*.js",
+    "./config": "./dist/config.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc -b"
   },
   "keywords": [],
   "author": "",
@@ -16,10 +16,14 @@
   "type": "module",
   "description": "",
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.0.4",
     "@types/slug": "^5.0.9",
     "@workspace/typescript-config": "workspace:*"
   },
   "dependencies": {
+    "dotenv": "^16.5.0",
+    "jsonwebtoken": "^9.0.2",
     "nanoid": "^5.1.5",
     "slug": "^11.0.0",
     "zod": "^3.25.67"
