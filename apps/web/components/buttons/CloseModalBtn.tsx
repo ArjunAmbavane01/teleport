@@ -7,9 +7,7 @@ interface CloseModalBtnProps {
 }
 
 const CloseModalBtn: React.FC<CloseModalBtnProps> = ({ text, onClick }: CloseModalBtnProps) => {
-    return (
-        <Button variant={'ghost'} onClick={onClick}>{text}</Button>
-    )
+    return (<Button variant={'ghost'} onClick={onClick}>{text}</Button>)
 }
 
 export default CloseModalBtn

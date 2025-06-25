@@ -1,26 +1,21 @@
-"use client"
-
 import OpenNewArenaModalBtn from "@/components/buttons/OpenNewArenaModalBtn";
-import { Session } from "next-auth";
-import { useState } from "react";
-import CreateArenaModal from "./CreateArenaModal";
+import { Suspense } from "react";
+import ArenasList from "./ArenasList";
 
-interface DashboardProps {
-    session: Session | null;
-}
-
-const Dashboard: React.FC<DashboardProps> = ({ session }: DashboardProps) => {
-
-    const [isCreateArenaModalOpen, setIsCreateArenaModalOpen] = useState<boolean>(false);
+const Dashboard: React.FC = () => {
     return (
-        <div className="flex flex-col gap-5 p-10 mx-auto max-w-8xl w-full h-screen relative">
+        <div className="flex flex-col gap-20 p-10 mx-auto max-w-8xl w-full h-screen relative">
             <div className="flex items-center gap-10">
                 <div className="text-3xl">
                     Dashboard
                 </div>
-                <OpenNewArenaModalBtn setIsCreateArenaModalOpen={setIsCreateArenaModalOpen} />
+                <OpenNewArenaModalBtn />
             </div>
-            {isCreateArenaModalOpen && <CreateArenaModal setIsCreateArenaModalOpen={setIsCreateArenaModalOpen} session={session} />}
+            <div>
+                <Suspense fallback={<div>Loading Arenas</div>}>
+                    <ArenasList />
+                </Suspense>
+            </div>
         </div>
     )
 }

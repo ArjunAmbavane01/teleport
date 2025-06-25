@@ -1,15 +1,11 @@
 import { redirect } from "next/navigation"
 import SignInpage from "./signIn";
-import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
+import { auth } from "@/app/api/auth/[...nextauth]/options";
 
 const Page: React.FC = async () => {
-
-    const isAuthenticated = await checkIsAuthenticated();;
-    if (isAuthenticated) redirect('/dashboard'); 
-       
-    return (
-        <SignInpage />
-    )
+    const session = await auth();
+    if (session) redirect('/dashboard');
+    return (<SignInpage />)
 }
 
 export default Page;

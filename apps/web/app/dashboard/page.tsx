@@ -1,18 +1,13 @@
-import { checkIsAuthenticated } from "@/lib/auth/checkIsAuthenticated";
-import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth/requireAuth";
 import Navbar from "./_components/Navbar";
 import Dashboard from "./_components/Dashboard";
-import { auth } from "@/app/api/auth/[...nextauth]/options";
 
 const Page: React.FC = async () => {
-    const isAuthenticated = await checkIsAuthenticated();
-    if (!isAuthenticated) redirect('/auth/sign-in');
-
-    const session = await auth();
+    const user = await requireAuth();
     return (
         <section className="flex flex-col w-full h-screen overflow-hidden relative">
-            <Navbar session={session} />
-            <Dashboard session={session}/>
+            <Navbar user={user}/>
+            <Dashboard />
         </section>
     )
 }

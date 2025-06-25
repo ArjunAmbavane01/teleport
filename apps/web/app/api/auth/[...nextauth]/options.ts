@@ -1,6 +1,6 @@
+import NextAuth, { NextAuthConfig, NextAuthResult } from "next-auth"
 import { prisma, PrismaClient } from "@workspace/db";
 import { PrismaAdapter } from "@workspace/db/adapter";
-import NextAuth, { NextAuthConfig, NextAuthResult } from "next-auth"
 import Google from "next-auth/providers/google"
 
 const config: NextAuthConfig = {
