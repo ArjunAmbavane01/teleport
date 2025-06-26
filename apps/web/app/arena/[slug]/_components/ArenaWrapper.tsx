@@ -7,7 +7,7 @@ import { BASE_WS_URL } from '@/lib/api/apiEndPoints';
 interface ArenaWrapperProps {
     wsToken: string | undefined;
 }
-const ArenaWrapper = ({ wsToken }: ArenaWrapperProps) => {
+const ArenaWrapper:React.FC<ArenaWrapperProps> = ({ wsToken }: ArenaWrapperProps) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
     useEffect(() => {
         const ws = new WebSocket(`${BASE_WS_URL as string}?token=${wsToken}`);

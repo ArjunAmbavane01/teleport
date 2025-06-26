@@ -1,22 +1,14 @@
 "use client"
 
-import { Button } from "@workspace/ui/components/button";
+import ArenaRenderer from "@/pixi/ArenaRenderer";
 
 interface ArenaProps {
     socket: WebSocket | null;
 }
 
-const Arena = ({ socket }: ArenaProps) => {
+const Arena:React.FC<ArenaProps> = ({ socket }: ArenaProps) => {
     return (
-        <div>
-            Arena
-            {socket && <Button onClick={() => {
-                socket?.send(JSON.stringify({
-                    type: 'message',
-                    message: "Hello there"
-                }))
-            }}>Click me</Button>}
-        </div>
+        <ArenaRenderer />
     )
 }
 

@@ -1,4 +1,4 @@
-const loading = () => {
+const loading:React.FC = () => {
   return (
     <div>
       Loading
