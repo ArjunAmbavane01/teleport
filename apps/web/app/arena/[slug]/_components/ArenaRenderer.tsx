@@ -10,4 +10,4 @@ const ArenaRenderer: React.FC = () => {
     )
 }
 
-export default ArenaRenderer
+export default ArenaRenderer;

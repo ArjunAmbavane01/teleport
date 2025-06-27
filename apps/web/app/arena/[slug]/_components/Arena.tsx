@@ -1,6 +1,7 @@
 "use client"
 
-import ArenaRenderer from "@/pixi/ArenaRenderer";
+import ArenaRenderer from "./ArenaRenderer";
+
 
 interface ArenaProps {
     socket: WebSocket | null;

@@ -1,7 +1,9 @@
 "use client"
 
-import { Application, Assets, Container, Graphics, Sprite } from "pixi.js";
 import { useEffect, useRef, useState } from "react";
+import { Application, Assets, Container, Graphics, Sprite } from "pixi.js";
+import { ARENA_COLS, ARENA_ROWS, OFFSET_X, OFFSET_Y, TILE_SIZE } from "@/lib/arena/ArenaConstants";
+import { COLLISION_MAP } from "@/lib/arena/CollisionMap";
 
 const ArenaMap: React.FC = () => {
     const [isArenaLoaded, setIsArenaLoaded] = useState<boolean>(false);
@@ -24,7 +26,6 @@ const ArenaMap: React.FC = () => {
         })
 
         appRef.current = app;
-        console.log(canvasRef.current);
         canvasRef.current.appendChild(app.view as HTMLCanvasElement);
 
         const worldContainer = new Container();
@@ -52,7 +53,7 @@ const ArenaMap: React.FC = () => {
         try {
             const mapTexture = await Assets.load('/maps/map.png');
             const mapSprite = new Sprite(mapTexture);
-            mapSprite.scale.set(2, 2);
+            mapSprite.scale.set(1);
             mapContainer.addChild(mapSprite);
             mapContainer.x = app.screen.width / 2 - mapSprite.width / 2;
             mapContainer.y = app.screen.height / 2 - mapSprite.height / 2;
@@ -62,7 +63,8 @@ const ArenaMap: React.FC = () => {
         }
     }
 
-    const createPlayer = (app: Application, playerContainer: Container) => {
+    const createPlayer = async (app: Application, playerContainer: Container) => {
+        // const playerTexture = await Assets.load('/character/Alex_idle_16x16.png');
         const graphics = new Graphics();
         graphics.beginFill(0xff0000);
         graphics.drawCircle(0, 0, 16);
@@ -70,6 +72,7 @@ const ArenaMap: React.FC = () => {
 
         const playerTexture = app.renderer.generateTexture(graphics);
         const player = new Sprite(playerTexture);
+        player.scale.set(2);
 
         player.anchor.set(0.5);
         player.x = app.screen.width / 2;
@@ -81,7 +84,7 @@ const ArenaMap: React.FC = () => {
 
     const createPlaceholderMap = (mapContainer: Container) => {
         const graphics = new Graphics();
-        graphics.lineStyle(1, 0x666666);
+        graphics.lineStyle(1, 0xFF0000);
         const tileSize = 32;
         const mapWidth = 50;
         const mapHeight = 30;
@@ -109,18 +112,40 @@ const ArenaMap: React.FC = () => {
             if (!playerRef.current || !mapContainerRef.current) return;
             const player = playerRef.current;
             const mapContainer = mapContainerRef.current;
-            if (keys['KeyW'] || keys['ArrowUp']) {
-                player.y -= moveSpeed;
+            // if (keys['KeyW'] || keys['ArrowUp']) {
+            //     player.y -= moveSpeed;
+            // }
+            // if (keys['KeyS'] || keys['ArrowDown']) {
+            //     player.y += moveSpeed;
+            // }
+            // if (keys['KeyA'] || keys['ArrowLeft']) {
+            //     player.x -= moveSpeed;
+            // }
+            // if (keys['KeyD'] || keys['ArrowRight']) {
+            //     player.x += moveSpeed;
+            // }
+            const tryMove = (dx: number, dy: number) => {
+                const newX = player.x + dx;
+                const newY = player.y + dy;
+
+                const tileCol = Math.floor((newX - OFFSET_X) / TILE_SIZE);
+                const tileRow = Math.floor((newY - OFFSET_Y) / TILE_SIZE);
+
+                if (
+                    tileCol >= 0 && tileCol < ARENA_COLS &&
+                    tileRow >= 0 && tileRow < ARENA_ROWS &&
+                    COLLISION_MAP[tileRow] &&
+                    COLLISION_MAP[tileRow][tileCol] === 0 // walkable
+                ) {
+                    player.x = newX;
+                    player.y = newY;
+                }
             }
-            if (keys['KeyS'] || keys['ArrowDown']) {
-                player.y += moveSpeed;
-            }
-            if (keys['KeyA'] || keys['ArrowLeft']) {
-                player.x -= moveSpeed;
-            }
-            if (keys['KeyD'] || keys['ArrowRight']) {
-                player.x += moveSpeed;
-            }
+
+            if (keys['KeyW'] || keys['ArrowUp']) tryMove(0, -moveSpeed);
+            if (keys['KeyS'] || keys['ArrowDown']) tryMove(0, moveSpeed);
+            if (keys['KeyA'] || keys['ArrowLeft']) tryMove(-moveSpeed, 0);
+            if (keys['KeyD'] || keys['ArrowRight']) tryMove(moveSpeed, 0);
 
             const targetX = app.screen.width / 2 - player.x;
             const targetY = app.screen.height / 2 - player.y;
