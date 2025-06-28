@@ -1,7 +1,7 @@
 "use client"
 
-import ArenaRenderer from "./ArenaRenderer";
-
+import ArenaMap from "./Arena/Stage";
+import BottomMenu from "./BottomMenu";
 
 interface ArenaProps {
     socket: WebSocket | null;
@@ -9,7 +9,10 @@ interface ArenaProps {
 
 const Arena:React.FC<ArenaProps> = ({ socket }: ArenaProps) => {
     return (
-        <ArenaRenderer />
+         <div className='w-screen h-screen overflow-hidden bg-black relative'>
+            <ArenaMap />
+            <BottomMenu />
+        </div>
     )
 }
 
