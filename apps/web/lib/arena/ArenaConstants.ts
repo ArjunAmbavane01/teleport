@@ -13,3 +13,14 @@ export const DEFAULT_POS_Y = 11 * TILE_SIZE;
 
 export const ANIMATION_SPEED = 0.15;
 export const MOVE_SPEED = 3;
+
+export const Keys = {
+    w: { pressed: false },
+    a: { pressed: false },
+    s: { pressed: false },
+    d: { pressed: false },
+    arrowup: { pressed: false },
+    arrowleft: { pressed: false },
+    arrowdown: { pressed: false },
+    arrowright: { pressed: false }
+};

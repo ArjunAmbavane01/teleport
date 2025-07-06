@@ -1,6 +1,6 @@
 "use client"
 
-import ArenaMap from "./Arena/Stage";
+import ArenaMap from "./ArenaMap";
 import BottomMenu from "./BottomMenu";
 
 interface ArenaProps {
