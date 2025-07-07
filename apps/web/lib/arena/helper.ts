@@ -1,3 +1,6 @@
+import { Boundary } from "../class/Boundary";
+import { Sprite } from "../class/Sprite";
+
 export const loadImage = async (src: string): Promise<HTMLImageElement> => {
     return new Promise((res, rej) => {
         const image = new Image();
@@ -5,4 +8,13 @@ export const loadImage = async (src: string): Promise<HTMLImageElement> => {
         image.onerror = () => rej(new Error(`Failed to load image: ${src}`));
         image.src = src;
     })
+}
+
+export const rectangularCollision = (sprite: Sprite, boundary: Boundary) => {
+    return (
+        (sprite.posX + sprite.width >= boundary.posX) &&
+        (sprite.posX <= boundary.posX + Boundary.width) &&
+        (sprite.posY <= boundary.posY + Boundary.height) &&
+        (sprite.posY + sprite.height >= boundary.posY)
+    )
 }

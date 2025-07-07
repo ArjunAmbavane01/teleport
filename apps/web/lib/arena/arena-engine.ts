@@ -1,13 +1,15 @@
 import { Boundary } from "../class/Boundary";
+import { ForegroundMap } from "../class/Foreground";
 import { Sprite } from "../class/Sprite";
 import { Keys, OFFSET_X, OFFSET_Y } from "./ArenaConstants";
 import { collisionMap } from "./CollisionMap";
-import { loadImage } from "./helper";
+import { loadImage, rectangularCollision } from "./helper";
+import { Directions, Movables } from "./types";
 
 export class Arena {
     private ctx: CanvasRenderingContext2D;
-    private arenaPosX: number = 0;
-    private arenaPosY: number = 0;
+    private posX: number = 0;
+    private posY: number = 0;
     private arenaWidth: number = 2000;
     private arenaHeight: number = 2000;
     private arenaMapImage: HTMLImageElement | null = null;
@@ -16,7 +18,10 @@ export class Arena {
     private keys: typeof Keys = Keys;
     private collision_map: number[][] = [];
     private boundaries: Boundary[] = [];
-    private testBoundary: Boundary;
+    private movables: Movables = [];
+    private foregroundMap: ForegroundMap | null = null;
+    private isSpriteMoving: boolean = false;
+    private spriteDirection:Directions = 'up';
 
 
     constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
@@ -24,8 +29,8 @@ export class Arena {
         this.arenaWidth = canvas.width;
         this.arenaHeight = canvas.height;
 
-        this.arenaPosX = OFFSET_X
-        this.arenaPosY = OFFSET_Y;
+        this.posX = OFFSET_X
+        this.posY = OFFSET_Y;
 
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(0, 0, this.arenaWidth, this.arenaHeight);
@@ -45,14 +50,14 @@ export class Arena {
             })
         })
 
-        this.testBoundary = new Boundary(400, 300);
-        this.testBoundary.render(this.ctx);
+        this.movables = [this, ...this.boundaries];
 
         window.addEventListener('keydown', this.handleMove);
         window.addEventListener('keyup', this.handleKeyUp);
     }
 
     private handleKeyUp = (e: KeyboardEvent) => {
+        this.isSpriteMoving = false
         const keyPressed = e.key.toLowerCase();
         switch (keyPressed) {
             case 'w':
@@ -83,21 +88,26 @@ export class Arena {
     }
 
     private handleMove = (e: KeyboardEvent) => {
+        this.isSpriteMoving = true;
         const keyPressed = e.key.toLowerCase();
         switch (keyPressed) {
             case 'w':
+                this.spriteDirection = 'up';
                 this.keys.w.pressed = true;
                 this.lastKeyPressed = 'w';
                 break;
             case 'a':
+                     this.spriteDirection = 'left';
                 this.keys.a.pressed = true;
                 this.lastKeyPressed = 'a';
                 break;
             case 's':
+                this.spriteDirection = 'down';
                 this.keys.s.pressed = true;
                 this.lastKeyPressed = 's';
                 break;
             case 'd':
+                this.spriteDirection = 'right';
                 this.keys.d.pressed = true;
                 this.lastKeyPressed = 'd';
                 break;
@@ -121,48 +131,104 @@ export class Arena {
     }
 
     private render = () => {
+        
         window.requestAnimationFrame(this.render);
         this.ctx.clearRect(0, 0, this.arenaWidth, this.arenaHeight);
-        if (this.arenaMapImage) this.ctx.drawImage(this.arenaMapImage, this.arenaPosX, this.arenaPosY);
+        if (this.arenaMapImage) this.ctx.drawImage(this.arenaMapImage, this.posX, this.posY);
 
-        // if (!(this.boundaries.length === 0)) this.boundaries.forEach((boundary) => boundary.render(this.ctx));
+        if (!(this.boundaries.length === 0)) this.boundaries.forEach((boundary) => {
+            boundary.render(this.ctx);
+        });
 
-        this.testBoundary.render(this.ctx);
-        if (this.sprite) this.sprite.render();
+        if (this.sprite) {
+            this.sprite.render(this.isSpriteMoving,this.spriteDirection);
+        }
+
+        if (this.foregroundMap) {
+            this.foregroundMap.render();
+        }
+
+        let canSpriteMove: boolean = true;
 
         if (this.keys.w.pressed && this.lastKeyPressed === 'w') {
-            // this.testBoundary.move(3, 3, this.ctx);
-            this.testBoundary.posY += 3;
-            this.arenaPosY += 3;
+            for (let i = 0; i < this.boundaries.length; i++) {
+                const boundary = this.boundaries[i] as Boundary;
+                if (this.sprite && rectangularCollision(this.sprite, {
+                    posX: boundary.posX,
+                    posY: boundary.posY + 3,
+                } as Boundary)
+                ) {
+                    canSpriteMove = false;
+                    break;
+                }
+            }
+
+            if (canSpriteMove) this.movables.forEach((movable) => (movable as { posY: number }).posY += 3);
         }
-        if (this.keys.a.pressed && this.lastKeyPressed === 'a') {
-            this.arenaPosX += 3;
-            this.testBoundary.posX += 3;
+        else if (this.keys.a.pressed && this.lastKeyPressed === 'a') {
+            for (let i = 0; i < this.boundaries.length; i++) {
+                const boundary = this.boundaries[i] as Boundary;
+                if (this.sprite && rectangularCollision(this.sprite, {
+                    posX: boundary.posX + 3,
+                    posY: boundary.posY,
+                } as Boundary)
+                ) {
+                    canSpriteMove = false;
+                    break;
+                }
+            }
+
+            if (canSpriteMove) this.movables.forEach((movable) => (movable as { posX: number }).posX += 3);
 
         }
-        if (this.keys.s.pressed && this.lastKeyPressed === 's') {
-            this.arenaPosY -= 3;
-            this.testBoundary.posY -= 3;
+        else if (this.keys.s.pressed && this.lastKeyPressed === 's') {
+            for (let i = 0; i < this.boundaries.length; i++) {
+                const boundary = this.boundaries[i] as Boundary;
+                if (this.sprite && rectangularCollision(this.sprite, {
+                    posX: boundary.posX,
+                    posY: boundary.posY - 3,
+                } as Boundary)
+                ) {
+                    canSpriteMove = false;
+                    break;
+                }
+            }
+
+            if (canSpriteMove) this.movables.forEach((movable) => (movable as { posY: number }).posY -= 3);
 
         }
-        if (this.keys.d.pressed && this.lastKeyPressed === 'd') {
-            this.arenaPosX -= 3;
-            this.testBoundary.posX -= 3;
+        else if (this.keys.d.pressed && this.lastKeyPressed === 'd') {
+            for (let i = 0; i < this.boundaries.length; i++) {
+                const boundary = this.boundaries[i] as Boundary;
+                if (this.sprite && rectangularCollision(this.sprite, {
+                    posX: boundary.posX - 3,
+                    posY: boundary.posY,
+                } as Boundary)
+                ) {
+                    canSpriteMove = false;
+                    break;
+                }
+            }
 
+            if (canSpriteMove) this.movables.forEach((movable) => (movable as { posX: number }).posX -= 3);
         }
-        // if (this.keys.arrowup.pressed && this.lastKeyPressed === 'arrowup') this.arenaPosY += 3;
-        // if (this.keys.arrowleft.pressed && this.lastKeyPressed === 'arrowleft') this.arenaPosX += 3;
-        // if (this.keys.arrowdown.pressed && this.lastKeyPressed === 'arrowdown') this.arenaPosY -= 3;
-        // if (this.keys.arrowright.pressed && this.lastKeyPressed === 'arrowright') this.arenaPosX -= 3;
+        // if (this.keys.arrowup.pressed && this.lastKeyPressed === 'arrowup') this.posY += 3;
+        // if (this.keys.arrowleft.pressed && this.lastKeyPressed === 'arrowleft') this.posX += 3;
+        // if (this.keys.arrowdown.pressed && this.lastKeyPressed === 'arrowdown') this.posY -= 3;
+        // if (this.keys.arrowright.pressed && this.lastKeyPressed === 'arrowright') this.posX -= 3;
     }
 
     initializeAssets = async () => {
         const arenaImageSrc: string = '/maps/Teleport map.png';
         const spriteImageSrc: string = '/characters/Alex.png';
+        const foregroundImageSrc: string = '/maps/Foreground map.png';
         this.arenaMapImage = await loadImage(arenaImageSrc);
         const spriteImage = await loadImage(spriteImageSrc);
+        const foregroundImage = await loadImage(foregroundImageSrc);
         // sprite posx poy should be in center of screen
-        this.sprite = new Sprite(460, 350, spriteImage, this.ctx);
+        this.sprite = new Sprite(460, 350, 32, 60, 8, spriteImage, this.ctx);
+        this.foregroundMap = new ForegroundMap(OFFSET_X, OFFSET_Y, this.arenaWidth, this.arenaHeight, foregroundImage, this.ctx)
+        this.movables.push(this.foregroundMap);
         this.render();
     }
 
