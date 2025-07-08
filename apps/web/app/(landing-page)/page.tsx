@@ -1,7 +1,7 @@
 import HeroSection from "./_components/HeroSection"
 import Navbar from "./_components/Navbar"
 
-export default function Page() {
+const Page: React.FC = () => {
   return (
     <section>
       <Navbar />
@@ -9,3 +9,5 @@ export default function Page() {
     </section>
   )
 }
+
+export default Page;

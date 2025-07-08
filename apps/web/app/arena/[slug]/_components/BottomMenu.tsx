@@ -1,9 +1,7 @@
-import React from 'react'
-
-const BottomMenu:React.FC = () => {
+const BottomMenu: React.FC = () => {
   return (
     <div className='fixed bottom-6 mx-auto inset-x-0 w-lg h-12 rounded bg-blue-800 z-50'>
-      
+
     </div>
   )
 }

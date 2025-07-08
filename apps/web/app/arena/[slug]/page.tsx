@@ -14,7 +14,7 @@ const Page: React.FC<PageProps> = async ({ params }: PageProps) => {
   const wsToken = createWsToken(user.id as string, res.id);
   if (!wsToken) return <div>Some Internal Error Occurred</div>
 
-  return (<ArenaWrapper wsToken={wsToken} />)
+  return <ArenaWrapper wsToken={wsToken} />
 }
 
 export default Page;

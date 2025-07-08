@@ -1,4 +1,4 @@
-import SignInButton from "@/components/buttons/SignInBtn";
+import SignInButton from "@/components/buttons/SignIn";
 import { Github } from "lucide-react";
 
 const Navbar: React.FC = () => {
