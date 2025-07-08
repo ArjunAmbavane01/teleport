@@ -1,3 +1,6 @@
+import { Boundary } from "../Boundary"
+import { Sprite } from "../Sprite"
+
 export const rectangularCollision = (sprite: Sprite, boundary: Boundary) => {
     return (
         (sprite.posX + sprite.width >= boundary.posX) &&

@@ -1,36 +1,29 @@
-import { Directions } from "../../lib/arena/types";
+import { Direction } from "./types";
+import { getDirectionRow } from "./utils/helper";
 
 export class Sprite {
-    private ctx: CanvasRenderingContext2D;
-    private spriteImage: HTMLImageElement | null = null;
     posX: number;
     posY: number;
-    private readonly spritesheetCols: number = 13;
-    private readonly spritesheetRows: number = 54;
     width: number;
     height: number;
     frameNo: number = 0;
-    private framesPerDirection: number;
 
+    private spriteImage: HTMLImageElement;
+    private readonly spritesheetCols = 13;
+    private readonly spritesheetRows = 54;
+    private readonly framesPerDirection: number;
+    private readonly directionRowOffset = 8;
 
-    constructor(posX: number, posY: number, width: number, height: number, framesPerDirection: number, image: HTMLImageElement, ctx: CanvasRenderingContext2D) {
+    constructor(posX: number, posY: number, width: number, height: number, framesPerDirection: number, image: HTMLImageElement) {
         this.posX = posX;
         this.posY = posY;
-        this.spriteImage = image;
-        this.ctx = ctx;
-
-        this.framesPerDirection = framesPerDirection;
-        // this.width = this.spriteImage.width / this.spritesheetCols;
-        // this.height = this.spriteImage.height / this.spritesheetRows;
         this.width = width;
         this.height = height;
-
+        this.spriteImage = image;
+        this.framesPerDirection = framesPerDirection;
     }
 
-
-
     /* 
-    
     this.ctx.drawImage(
     image,
     cropping x,
@@ -42,34 +35,19 @@ export class Sprite {
     actual width,
     actual height,
     )
-    
     */
 
-    render = (isSpriteMoving: boolean, spriteDirection: Directions, arenaWidth: number = 0, arenaHeight: number = 0) => {
+    render = (isSpriteMoving: boolean, spriteDirection: Direction, ctx: CanvasRenderingContext2D) => {
         if (!this.spriteImage) return;
-        let direction;
-        switch (spriteDirection) {
-            case 'up': {
-                direction = 0;
-                break;
-            }
-            case 'left': {
-                direction = 1;
-                break;
-            }
-            case 'down': {
-                direction = 2;
-                break;
-            }
-            case 'right': {
-                direction = 3;
-                break;
-            }
-        }
-        this.ctx.drawImage(
+        const dirIndex = getDirectionRow(spriteDirection);
+
+        const cropX = this.width / 2 + this.spriteImage.width / this.spritesheetCols * this.frameNo
+        const cropY = this.height / 6 + this.spriteImage.height / this.spritesheetRows * (8 + dirIndex);
+
+        ctx.drawImage(
             this.spriteImage,
-            this.width / 2 + this.spriteImage.width / this.spritesheetCols * this.frameNo,
-            this.height / 6 + this.spriteImage.height / this.spritesheetRows * (8 + direction),
+            cropX,
+            cropY,
             this.width,
             this.height,
             this.posX,
@@ -77,10 +55,7 @@ export class Sprite {
             this.width,
             this.height,
         );
-        if (isSpriteMoving) {
-            this.frameNo = this.frameNo < this.framesPerDirection ? this.frameNo + 1 : 0;
-            console.log(this.frameNo)
-        }
+        if (isSpriteMoving) this.frameNo = (this.frameNo + 1) % this.framesPerDirection;
     }
 }
 

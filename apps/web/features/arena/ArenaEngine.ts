@@ -1,235 +1,162 @@
-import { Boundary } from "./Boundary";
-import { ForegroundMap } from "./Foreground";
 import { Sprite } from "./Sprite";
-import { Keys, OFFSET_X, OFFSET_Y } from "../../lib/arena/ArenaConstants";
-import { collisionMap } from "./utils/CollisionMap";
-import { loadImage, rectangularCollision } from "../../lib/arena/helper";
-import { Directions, Movables } from "../../lib/arena/types";
+import { ForegroundMap } from "./Foreground";
+import { Boundary } from "./Boundary";
+import { rectangularCollision } from "./utils/collision";
+import { COLLISION_MAP } from "./utils/CollisionMap";
+import { loadImage } from "./utils/image";
+import { Direction, Movables } from "./types";
+import { Keys, ARENA_OFFSET_X, ARENA_OFFSET_Y, MOVE_SPEED, COLLISION_BLOCK_ID, DEFAULT_USER_POS_Y, DEFAULT_USER_POS_X, keyDirs, keyToDirection } from "./ArenaConstants";
 
 export class Arena {
+
     private ctx: CanvasRenderingContext2D;
-    private posX: number = 0;
-    private posY: number = 0;
-    private arenaWidth: number = 2000;
-    private arenaHeight: number = 2000;
+    private posX: number;
+    private posY: number;
+    private arenaWidth: number;
+    private arenaHeight: number;
     private arenaMapImage: HTMLImageElement | null = null;
-    private sprite: Sprite | null = null;
-    private lastKeyPressed: string | '' = '';
-    private keys: typeof Keys = Keys;
-    private collision_map: number[][] = [];
+    private localUser: Sprite | null = null;
+    private otherUsers: Sprite[] = [];
     private boundaries: Boundary[] = [];
     private movables: Movables = [];
     private foregroundMap: ForegroundMap | null = null;
-    private isSpriteMoving: boolean = false;
-    private spriteDirection: Directions = 'up';
+
+    private lastDirectionKey: string | '' = '';
+    private keys: typeof Keys = Keys;
+    private isUserMoving: boolean = false;
+    private userDirection: Direction = 'up';
 
 
     constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+
         this.ctx = ctx;
         this.arenaWidth = canvas.width;
         this.arenaHeight = canvas.height;
-
-        this.posX = OFFSET_X
-        this.posY = OFFSET_Y;
+        this.posX = ARENA_OFFSET_X;
+        this.posY = ARENA_OFFSET_Y;
 
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(0, 0, this.arenaWidth, this.arenaHeight);
 
-        this.initializeAssets();
+        this.initAssets();
+        this.initListeners();
 
-        for (let i = 0; i < collisionMap.length; i += 100) {
-            this.collision_map.push(collisionMap.slice(i, 100 + i));
-        }
+        const collisionMap: number[][] = [];
+        for (let i = 0; i < COLLISION_MAP.length; i += 100) collisionMap.push(COLLISION_MAP.slice(i, 100 + i));
 
-        this.collision_map.forEach((row, rowIdx) => {
+        collisionMap.forEach((row, rowIdx) => {
             row.forEach((block, colIdx) => {
-                if (block === 34774) {
-                    this.boundaries.push(new Boundary(OFFSET_X + colIdx * Boundary.width, OFFSET_Y + rowIdx * Boundary.height));
+                if (block === COLLISION_BLOCK_ID) {
+                    this.boundaries.push(new Boundary(ARENA_OFFSET_X + colIdx * Boundary.width, ARENA_OFFSET_Y + rowIdx * Boundary.height));
                 }
-
             })
         })
 
-        this.movables = [this, ...this.boundaries];
-
-        window.addEventListener('keydown', this.handleMove);
-        window.addEventListener('keyup', this.handleKeyUp);
     }
 
     private handleKeyUp = (e: KeyboardEvent) => {
-        this.isSpriteMoving = false
-        const keyPressed = e.key.toLowerCase();
-        switch (keyPressed) {
-            case 'w':
-                this.keys.w.pressed = false;
-                break;
-            case 'a':
-                this.keys.a.pressed = false;
-                break;
-            case 's':
-                this.keys.s.pressed = false;
-                break;
-            case 'd':
-                this.keys.d.pressed = false;
-                break;
-            case 'arrowup':
-                this.keys.arrowup.pressed = false;
-                break;
-            case 'arrowleft':
-                this.keys.arrowleft.pressed = false;
-                break;
-            case 'arrowdown':
-                this.keys.arrowdown.pressed = false;
-                break;
-            case 'arrowright':
-                this.keys.arrowright.pressed = false;
-                break;
+        const key = e.key.toLowerCase();
+        if (keyDirs.includes(key)) {
+            this.keys[key as keyof typeof this.keys].pressed = false;
+            this.isUserMoving = false;
         }
     }
 
     private handleMove = (e: KeyboardEvent) => {
-        this.isSpriteMoving = true;
-        const keyPressed = e.key.toLowerCase();
-        switch (keyPressed) {
-            case 'w':
-                this.spriteDirection = 'up';
-                this.keys.w.pressed = true;
-                this.lastKeyPressed = 'w';
-                break;
-            case 'a':
-                this.spriteDirection = 'left';
-                this.keys.a.pressed = true;
-                this.lastKeyPressed = 'a';
-                break;
-            case 's':
-                this.spriteDirection = 'down';
-                this.keys.s.pressed = true;
-                this.lastKeyPressed = 's';
-                break;
-            case 'd':
-                this.spriteDirection = 'right';
-                this.keys.d.pressed = true;
-                this.lastKeyPressed = 'd';
-                break;
-            case 'arrowup':
-                this.keys.arrowup.pressed = true;
-                this.lastKeyPressed = 'arrowup';
-                break;
-            case 'arrowleft':
-                this.keys.arrowleft.pressed = true;
-                this.lastKeyPressed = 'arrowleft';
-                break;
-            case 'arrowdown':
-                this.keys.arrowdown.pressed = true;
-                this.lastKeyPressed = 'arrowdown';
-                break;
-            case 'arrowright':
-                this.keys.arrowright.pressed = true;
-                this.lastKeyPressed = 'arrowright';
-                break;
+        const key = e.key.toLowerCase();
+        if (!keyDirs.includes(key)) return;
+
+        this.keys[key as keyof typeof this.keys].pressed = true;
+        this.lastDirectionKey = key;
+        this.isUserMoving = true;
+
+        if (key in keyToDirection) {
+            this.userDirection = keyToDirection[key] as Direction;
         }
     }
 
     private render = () => {
-
         window.requestAnimationFrame(this.render);
         this.ctx.clearRect(0, 0, this.arenaWidth, this.arenaHeight);
         if (this.arenaMapImage) this.ctx.drawImage(this.arenaMapImage, this.posX, this.posY);
 
-        if (!(this.boundaries.length === 0)) this.boundaries.forEach((boundary) => {
-            boundary.render(this.ctx);
-        });
+        if (!(this.boundaries.length === 0)) this.boundaries.forEach(boundary => boundary.render(this.ctx));
 
-        if (this.sprite) {
-            this.sprite.render(this.isSpriteMoving, this.spriteDirection);
-        }
+        if (this.localUser) this.localUser.render(this.isUserMoving, this.userDirection, this.ctx);
 
-        if (this.foregroundMap) {
-            this.foregroundMap.render();
-        }
+        if (this.foregroundMap) this.foregroundMap.render(this.ctx);
 
         let canSpriteMove: boolean = true;
 
-        if (this.keys.w.pressed && this.lastKeyPressed === 'w') {
+        if (this.keys.w.pressed && this.lastDirectionKey === 'w') {
+            // loop is to check if user is clashing or not
             for (let i = 0; i < this.boundaries.length; i++) {
                 const boundary = this.boundaries[i] as Boundary;
-                if (this.sprite && rectangularCollision(this.sprite, {
-                    posX: boundary.posX,
-                    posY: boundary.posY + 3,
-                } as Boundary)
-                ) {
+                if (this.localUser && rectangularCollision(this.localUser, { posX: boundary.posX, posY: boundary.posY + MOVE_SPEED } as Boundary)) {
                     canSpriteMove = false;
                     break;
                 }
             }
+            if (canSpriteMove) this.movables.forEach(movable => (movable as { posY: number }).posY += MOVE_SPEED);
 
-            if (canSpriteMove) this.movables.forEach((movable) => (movable as { posY: number }).posY += 3);
-        }
-        else if (this.keys.a.pressed && this.lastKeyPressed === 'a') {
+        } else if (this.keys.a.pressed && this.lastDirectionKey === 'a') {
             for (let i = 0; i < this.boundaries.length; i++) {
                 const boundary = this.boundaries[i] as Boundary;
-                if (this.sprite && rectangularCollision(this.sprite, {
-                    posX: boundary.posX + 3,
-                    posY: boundary.posY,
-                } as Boundary)
-                ) {
+                if (this.localUser && rectangularCollision(this.localUser, { posX: boundary.posX + MOVE_SPEED, posY: boundary.posY } as Boundary)) {
                     canSpriteMove = false;
                     break;
                 }
             }
+            if (canSpriteMove) this.movables.forEach(movable => (movable as { posX: number }).posX += MOVE_SPEED);
 
-            if (canSpriteMove) this.movables.forEach((movable) => (movable as { posX: number }).posX += 3);
-
-        }
-        else if (this.keys.s.pressed && this.lastKeyPressed === 's') {
+        } else if (this.keys.s.pressed && this.lastDirectionKey === 's') {
             for (let i = 0; i < this.boundaries.length; i++) {
                 const boundary = this.boundaries[i] as Boundary;
-                if (this.sprite && rectangularCollision(this.sprite, {
-                    posX: boundary.posX,
-                    posY: boundary.posY - 3,
-                } as Boundary)
-                ) {
+                if (this.localUser && rectangularCollision(this.localUser, { posX: boundary.posX, posY: boundary.posY - MOVE_SPEED } as Boundary)) {
                     canSpriteMove = false;
                     break;
                 }
             }
+            if (canSpriteMove) this.movables.forEach(movable => (movable as { posY: number }).posY -= MOVE_SPEED);
 
-            if (canSpriteMove) this.movables.forEach((movable) => (movable as { posY: number }).posY -= 3);
-
-        }
-        else if (this.keys.d.pressed && this.lastKeyPressed === 'd') {
+        } else if (this.keys.d.pressed && this.lastDirectionKey === 'd') {
             for (let i = 0; i < this.boundaries.length; i++) {
                 const boundary = this.boundaries[i] as Boundary;
-                if (this.sprite && rectangularCollision(this.sprite, {
-                    posX: boundary.posX - 3,
-                    posY: boundary.posY,
-                } as Boundary)
-                ) {
+                if (this.localUser && rectangularCollision(this.localUser, { posX: boundary.posX - MOVE_SPEED, posY: boundary.posY } as Boundary)) {
                     canSpriteMove = false;
                     break;
                 }
             }
+            if (canSpriteMove) this.movables.forEach(movable => (movable as { posX: number }).posX -= MOVE_SPEED);
 
-            if (canSpriteMove) this.movables.forEach((movable) => (movable as { posX: number }).posX -= 3);
         }
-        // if (this.keys.arrowup.pressed && this.lastKeyPressed === 'arrowup') this.posY += 3;
-        // if (this.keys.arrowleft.pressed && this.lastKeyPressed === 'arrowleft') this.posX += 3;
-        // if (this.keys.arrowdown.pressed && this.lastKeyPressed === 'arrowdown') this.posY -= 3;
-        // if (this.keys.arrowright.pressed && this.lastKeyPressed === 'arrowright') this.posX -= 3;
     }
 
-    initializeAssets = async () => {
-        const arenaImageSrc: string = '/maps/Teleport map.png';
+    private initAssets = async () => {
+
+        const arenaImageSrc: string = '/maps/arenaMap.png';
         const spriteImageSrc: string = '/characters/Alex.png';
-        const foregroundImageSrc: string = '/maps/Foreground map.png';
+        const foregroundImageSrc: string = '/maps/foregroundMap.png';
+
         this.arenaMapImage = await loadImage(arenaImageSrc);
         const spriteImage = await loadImage(spriteImageSrc);
         const foregroundImage = await loadImage(foregroundImageSrc);
-        // sprite posx poy should be in center of screen
-        this.sprite = new Sprite(460, 350, 32, 60, 8, spriteImage, this.ctx);
-        this.foregroundMap = new ForegroundMap(OFFSET_X, OFFSET_Y, this.arenaWidth, this.arenaHeight, foregroundImage, this.ctx)
-        this.movables.push(this.foregroundMap);
+
+        this.localUser = new Sprite(DEFAULT_USER_POS_X, DEFAULT_USER_POS_Y, 32, 60, 8, spriteImage);
+        this.foregroundMap = new ForegroundMap(ARENA_OFFSET_X, ARENA_OFFSET_Y, this.arenaWidth, this.arenaHeight, foregroundImage)
+
+        this.movables = [this, this.foregroundMap, ...this.boundaries,];
         this.render();
+    }
+
+    private initListeners = async () => {
+        window.addEventListener('keydown', this.handleMove);
+        window.addEventListener('keyup', this.handleKeyUp);
+    }
+
+    destroy() {
+        window.removeEventListener('keydown', this.handleMove);
+        window.removeEventListener('keyup', this.handleKeyUp);
     }
 
 }

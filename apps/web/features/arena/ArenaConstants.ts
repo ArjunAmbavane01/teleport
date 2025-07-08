@@ -1,24 +1,16 @@
+import { Direction } from "./types";
+
 export const TILE_SIZE = 16;
 export const ARENA_ZOOM = 1.35;
-export const OFFSET_X = -450;
-export const OFFSET_Y = -700;
 
+export const ARENA_OFFSET_X = -450;
+export const ARENA_OFFSET_Y = -700;
+// sprite posX and posY should be in the center of screen
+export const DEFAULT_USER_POS_X = 460;
+export const DEFAULT_USER_POS_Y = 350;
 
-
-export const ARENA_COLS = 32;
-export const ARENA_ROWS = 23;
-
-export const ARENA_WIDTH = TILE_SIZE * (ARENA_COLS - 2);
-export const ARENA_HEIGHT = TILE_SIZE * (ARENA_ROWS - 2);
-
-// export let OFFSET_X = 0;
-// export let OFFSET_Y = TILE_SIZE / 2;
-
-export const DEFAULT_POS_X = 15 * TILE_SIZE;
-export const DEFAULT_POS_Y = 11 * TILE_SIZE;
-
-export const ANIMATION_SPEED = 0.15;
 export const MOVE_SPEED = 3;
+export const COLLISION_BLOCK_ID = 34774;
 
 export const Keys = {
     w: { pressed: false },
@@ -30,3 +22,16 @@ export const Keys = {
     arrowdown: { pressed: false },
     arrowright: { pressed: false }
 };
+
+export const keyToDirection: Record<string, Direction> = {
+    w: 'up',
+    a: 'left',
+    s: 'down',
+    d: 'right',
+    arrowup: 'up',
+    arrowleft: 'left',
+    arrowdown: 'down',
+    arrowright: 'right',
+};
+
+export const keyDirs = ['w', 'a', 's', 'd', 'arrowup', 'arrowleft', 'arrowdown', 'arrowright'];

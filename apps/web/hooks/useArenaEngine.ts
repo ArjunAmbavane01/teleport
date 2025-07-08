@@ -1,3 +1,4 @@
+import { Arena } from '@/features/arena/ArenaEngine';
 import { RefObject, useEffect } from 'react'
 
 const useArenaEngine = (canvasRef: RefObject<HTMLCanvasElement | null>, ctxRef: RefObject<CanvasRenderingContext2D | null>) => {
@@ -6,12 +7,16 @@ const useArenaEngine = (canvasRef: RefObject<HTMLCanvasElement | null>, ctxRef: 
         if (!canvasRef.current) return;
         ctxRef.current = canvasRef.current.getContext('2d');
         if (!ctxRef.current) return;
-
+        let arena: Arena | null;
         const createArena = async () => {
-            const arena = new Arena(canvasRef.current as HTMLCanvasElement, ctxRef.current as CanvasRenderingContext2D);
+            arena = new Arena(canvasRef.current as HTMLCanvasElement, ctxRef.current as CanvasRenderingContext2D);
+            return arena.destroy;
         }
         createArena();
 
+        return () => {
+            if (arena) arena.destroy();
+        }
     }, []);
 }
 

@@ -6,4 +6,4 @@ export type Movables = (Arena | ForegroundMap | Boundary)[];
 
 export type Rect = { posX: number; posY: number; width: number; height: number };
 
-export type Directions = 'up' | 'down' | 'left' | 'right';
+export type Direction = 'up' | 'down' | 'left' | 'right';
