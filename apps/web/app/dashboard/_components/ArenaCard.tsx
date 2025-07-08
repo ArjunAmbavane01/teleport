@@ -1,5 +1,5 @@
-import { Arena } from "@workspace/common/schemas/arena.schema";
 import Link from "next/link";
+import { Arena } from "@workspace/common/schemas/arena.schema";
 
 interface ArenaCardProps {
     arena: Arena;

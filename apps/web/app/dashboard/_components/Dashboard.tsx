@@ -1,5 +1,5 @@
-import OpenNewArenaModalBtn from "@/components/buttons/OpenNewArenaModalBtn";
 import { Suspense } from "react";
+import OpenNewArenaModalBtn from "@/components/buttons/OpenNewArenaModal";
 import ArenasList from "./ArenasList";
 
 const Dashboard: React.FC = () => {

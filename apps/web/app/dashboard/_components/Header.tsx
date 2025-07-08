@@ -1,11 +1,11 @@
 import { User } from "next-auth";
-import SignOutButton from "@/components/buttons/SignOutBtn";
+import SignOutButton from "@/components/buttons/SignOut";
 
-interface NavbarProps {
+interface HeaderProps {
     user: User;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ user }: NavbarProps) => {
+const Header: React.FC<HeaderProps> = ({ user }: HeaderProps) => {
     return (
         <section className='flex items-center justify-between p-3 mx-auto h-12 w-full max-w-8xl bg-blue-100/10'>
             <div>
@@ -19,4 +19,4 @@ const Navbar: React.FC<NavbarProps> = ({ user }: NavbarProps) => {
     )
 }
 
-export default Navbar;
+export default Header;

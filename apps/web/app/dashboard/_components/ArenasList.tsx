@@ -3,7 +3,7 @@ import { requireAuth } from "@/lib/auth/requireAuth";
 import ArenaCard from "./ArenaCard";
 import { getUserArenas } from "@/actions/arenaActions";
 
-const ArenasList = async () => {
+const ArenasList:React.FC = async () => {
     const user = await requireAuth();
     const { id: userId } = user as { id: string };
     const userArenas = await getUserArenas(userId);

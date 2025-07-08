@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/auth/requireAuth";
-import Navbar from "./_components/Navbar";
+import Navbar from "./_components/Header";
 import Dashboard from "./_components/Dashboard";
 
 const Page: React.FC = async () => {
