@@ -9,6 +9,7 @@ export class Sprite {
     frameNo: number = 0;
 
     private spriteImage: HTMLImageElement;
+    private framesElapsed: number = 0;
     private readonly spritesheetCols = 13;
     private readonly spritesheetRows = 54;
     private readonly framesPerDirection: number;
@@ -42,7 +43,7 @@ export class Sprite {
         const dirIndex = getDirectionRow(spriteDirection);
 
         const cropX = this.width / 2 + this.spriteImage.width / this.spritesheetCols * this.frameNo
-        const cropY = this.height / 6 + this.spriteImage.height / this.spritesheetRows * (8 + dirIndex);
+        const cropY = this.height / 6 + this.spriteImage.height / this.spritesheetRows * (this.directionRowOffset + dirIndex);
 
         ctx.drawImage(
             this.spriteImage,
@@ -55,7 +56,9 @@ export class Sprite {
             this.width,
             this.height,
         );
-        if (isSpriteMoving) this.frameNo = (this.frameNo + 1) % this.framesPerDirection;
+        if (!isSpriteMoving) return;
+        this.framesElapsed = (this.framesElapsed + 1) % 7;
+        if (this.framesElapsed === 0) this.frameNo = (this.frameNo + 1) % this.framesPerDirection;
     }
 }
 

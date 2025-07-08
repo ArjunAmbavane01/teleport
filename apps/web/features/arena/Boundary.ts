@@ -12,8 +12,7 @@ export class Boundary {
     }
 
     render(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = 'rgba(255,0,0,0.3)';
+        ctx.fillStyle = 'rgba(255,0,0,0)';
         ctx.fillRect(this.posX, this.posY, Boundary.width, Boundary.height);
     }
-
 }
