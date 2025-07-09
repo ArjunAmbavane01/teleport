@@ -9,8 +9,8 @@ interface ArenaProps {
 
 const Arena:React.FC<ArenaProps> = ({ socket }: ArenaProps) => {
     return (
-         <div className='w-screen h-screen overflow-hidden bg-black relative'>
-            <ArenaMap />
+         <div className='w-screen h-screen overflow-hidden bg-blue-200 relative'>
+            <ArenaMap socket={socket}/>
             <BottomMenu />
         </div>
     )
