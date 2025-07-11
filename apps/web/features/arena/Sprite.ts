@@ -40,7 +40,6 @@ export class Sprite {
 
     render = (isSpriteMoving: boolean, spriteDirection: Direction, ctx: CanvasRenderingContext2D) => {
         if (!this.spriteImage) return;
-        // console.log(this.posX, "  ", this.posY);
         const dirIndex = getDirectionRow(spriteDirection);
 
         const cropX = this.width / 2 + this.spriteImage.width / this.spritesheetCols * this.frameNo

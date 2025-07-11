@@ -9,7 +9,8 @@ export const ARENA_OFFSET_Y = -700;
 export const DEFAULT_USER_POS_X = 460;
 export const DEFAULT_USER_POS_Y = 350;
 
-export const MOVE_SPEED = 3;
+// change it back to 3
+export const MOVE_SPEED = 7;
 export const COLLISION_BLOCK_ID = 34774;
 
 export const Keys = {

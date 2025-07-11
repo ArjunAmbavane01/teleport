@@ -55,14 +55,54 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
             arenas: [arenaId],
         }
         users.push(newUser)
-    } else user.arenas.push(arenaId);
+    } else if (!user.arenas.includes(arenaId)) {
+        user.arenas.push(arenaId);
+    }
 
     ws.on('message', async (data,) => {
         try {
             const parsedData = typeof data === 'string' ? JSON.parse(data) : JSON.parse(data.toString());
-            console.log(parsedData);
+            if (parsedData.type === 'join_arena') {
+                console.log('joined')
+                users.forEach((user) => {
+                    if (user.arenas.includes(arenaId) && user.userId !== userId) {
+                        user.ws.send(JSON.stringify({
+                            type: 'user_joined',
+                            userId,
+                        }))
+                    }
+                })
+            }
+            else if (parsedData.type === 'hello') {
+                console.log('HELLO')
+                users.forEach((user) => {
+                    if (user.arenas.includes(arenaId) && user.userId !== userId) {
+                        const newMessage = {
+                            type: 'hello',
+                            data: { ...parsedData.data, userId }
+                        }
+                        user.ws.send(JSON.stringify(newMessage))
+                    }
+                })
+            }
+            else if (parsedData.type === 'user_update') {
+                users.forEach((user) => {
+                    if (user.arenas.includes(arenaId) && user.userId !== userId) {
+                        const newMessage = {
+                            type: 'user_update',
+                            data: { ...parsedData.data, userId }
+                        }
+                        user.ws.send(JSON.stringify(newMessage))
+                    }
+                })
+            }
         } catch (e) {
             console.error('Some error occurred ', e);
         }
-    })
+    });
+
+    ws.on('close', () => {
+        const index = users.findIndex(u => u.userId === userId);
+        if (index !== -1) users.splice(index, 1);
+    });
 })

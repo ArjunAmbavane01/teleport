@@ -44,7 +44,6 @@ const ArenaMap: React.FC<ArenaMapProps> = ({ socket }: ArenaMapProps) => {
     }, []);
 
     useArenaEngine(canvasRef, ctxRef, socket, proximityChatTriggerOn, proximityChatTriggerOff);
-    console.log(showChatTrigger)
     return <div className="relative w-screen h-screen">
         <canvas ref={canvasRef} className="w-full h-full" />
         {showChatTrigger && (

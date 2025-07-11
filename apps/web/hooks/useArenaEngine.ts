@@ -2,7 +2,7 @@ import { Arena } from '@/features/arena/ArenaEngine';
 import { SpriteCharacter } from '@/features/arena/types';
 import { RefObject, useEffect } from 'react'
 
-const useArenaEngine = (canvasRef: RefObject<HTMLCanvasElement | null>, ctxRef: RefObject<CanvasRenderingContext2D | null>, socket: WebSocket,proximityChatTriggerOn:()=>void,proximityChatTriggerOff:()=>void) => {
+const useArenaEngine = (canvasRef: RefObject<HTMLCanvasElement | null>, ctxRef: RefObject<CanvasRenderingContext2D | null>, socket: WebSocket, proximityChatTriggerOn: () => void, proximityChatTriggerOff: () => void) => {
     useEffect(() => {
 
         if (!canvasRef.current) return;
@@ -20,9 +20,10 @@ const useArenaEngine = (canvasRef: RefObject<HTMLCanvasElement | null>, ctxRef: 
         ctx.scale(dpr, dpr);
 
         let arena: Arena | null;
-        const character: SpriteCharacter = 'alex'
+        const character: SpriteCharacter = 'alex';
+        const username: string = 'Arjun';
         const createArena = async () => {
-            arena = new Arena(canvas, ctx, socket, character,proximityChatTriggerOn,proximityChatTriggerOff);
+            arena = new Arena(canvas, ctx, socket, username, character, proximityChatTriggerOn, proximityChatTriggerOff);
             console.log('created')
             return arena.destroy;
         }
@@ -31,7 +32,7 @@ const useArenaEngine = (canvasRef: RefObject<HTMLCanvasElement | null>, ctxRef: 
         return () => {
             if (arena) arena.destroy();
         }
-    }, [canvasRef,ctxRef,socket]);
+    }, [canvasRef, ctxRef, socket]);
 
 }
 
