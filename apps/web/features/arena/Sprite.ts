@@ -53,8 +53,8 @@ export class Sprite {
             this.height,
             this.posX,
             this.posY,
-            this.width,
-            this.height,
+            this.width+3,
+            this.height+3,
         );
         if (!isSpriteMoving) return;
         this.framesElapsed = (this.framesElapsed + 1) % 7;

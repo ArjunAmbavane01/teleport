@@ -3,11 +3,12 @@ import { Direction } from "./types";
 export const TILE_SIZE = 16;
 export const ARENA_ZOOM = 1.35;
 
-export const ARENA_OFFSET_X = -450;
-export const ARENA_OFFSET_Y = -700;
-// sprite posX and posY should be in the center of screen
-export const DEFAULT_USER_POS_X = 460;
-export const DEFAULT_USER_POS_Y = 350;
+export const ARENA_OFFSET_X = -150;
+export const ARENA_OFFSET_Y = -400;
+
+export const SPRITE_WIDTH = 32;
+export const SPRITE_HEIGHT = 60;
+export const FRAMES_PER_DIRECTION = 8;
 
 // change it back to 3
 export const MOVE_SPEED = 7;

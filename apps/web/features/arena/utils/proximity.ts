@@ -5,7 +5,7 @@ export function isWithinProximity(
   y1: number,
   x2: number,
   y2: number,
-  blockDistance: number = 3.5
+  blockDistance: number = 12
 ): boolean {
   const threshold = blockDistance * TILE_SIZE;
   const dx = x1 - x2;
