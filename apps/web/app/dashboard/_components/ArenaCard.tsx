@@ -8,7 +8,7 @@ interface ArenaCardProps {
 const ArenaCard: React.FC<ArenaCardProps> = ({ arena }: ArenaCardProps) => {
     return (
         <Link href={`/arena/${arena.slug}`} prefetch={false}>
-            <div className='grid grid-rows-3 size-52 rounded bg-gray-700 border border-white'>
+            <div className='grid grid-rows-3 size-52 -lg bg-gray-700 border border-white'>
                 <div className='row-span-2'>
 
                 </div>
