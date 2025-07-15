@@ -33,7 +33,6 @@ const useArenaEngine = (canvasRef: RefObject<HTMLCanvasElement | null>, ctxRef: 
             if (arena) arena.destroy();
         }
     }, [canvasRef, ctxRef, socket]);
-
 }
 
 export default useArenaEngine
