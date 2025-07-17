@@ -1,9 +1,12 @@
-import { ArenaRegions } from "../schemas/arena.schema.js";
+import { createArenaResponseSuccessSchema } from "../schemas/apiResponse.schema.js";
+import { arenaSchema, createArenaSchema } from "../schemas/arena.schema.js";
+import { z } from 'zod/v4';
 
-export interface Arena {
-    id: string;
-    name: string;
-    region: ArenaRegions;
-    adminId: string;
-    createdAt: Date;
-}
+export type Arena = z.infer<typeof arenaSchema>;
+
+export const ArenaRegionsEnum = z.enum(['office', 'garden']);
+
+export type ArenaRegions = z.infer<typeof ArenaRegionsEnum>;
+
+export type CreateArenaInput = z.infer<typeof createArenaSchema>;
+export type createArenaResponse = z.infer<typeof createArenaResponseSuccessSchema>;

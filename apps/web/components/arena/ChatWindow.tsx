@@ -14,9 +14,10 @@ interface ChatWindowProps {
     currentChatUser: RemoteUser | null;
     setCurrentChatUser: Dispatch<SetStateAction<RemoteUser | null>>;
     setOpenChatWindow: Dispatch<SetStateAction<boolean>>;
+    sendChatMessage: (message: string) => void;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ remoteUsers, currentChatUser, setCurrentChatUser, setOpenChatWindow }: ChatWindowProps) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ remoteUsers, currentChatUser, setCurrentChatUser, setOpenChatWindow, sendChatMessage }: ChatWindowProps) => {
     return (
         <motion.div
             initial={{ x: 40, opacity: 0 }}
@@ -27,28 +28,31 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ remoteUsers, currentChatUser, s
             <div className='flex items-center justify-between gap-3 w-full p-3 border-b border-foreground text-foreground'>
                 {!currentChatUser ?
                     (<span>Chat</span>) :
-                        <div className='flex flex-1 justify-start items-center gap-3'>
-                            <IoIosArrowBack
-                                onClick={() => setCurrentChatUser(null)}
-                                className="size-7 p-1 rounded-lg hover:bg-foreground/20 cursor-pointer"
-                            />
-                            <div className="flex items-center gap-3 text-base text-foreground">
-                                <Avatar className="size-6 rounded-full border border-foreground">
-                                    <AvatarImage src="https://github.com/shadcn.png" />
-                                    <AvatarFallback>{currentChatUser!.name.split(" ").map((w) => w.slice(0, 1)).join("")}</AvatarFallback>
-                                </Avatar>
-                                {currentChatUser!.name}
-                            </div>
+                    <div className='flex flex-1 justify-start items-center gap-3'>
+                        <IoIosArrowBack
+                            onClick={() => setCurrentChatUser(null)}
+                            className="size-7 p-1 rounded-lg hover:bg-foreground/20 cursor-pointer"
+                        />
+                        <div className="flex items-center gap-3 text-base text-foreground">
+                            <Avatar className="size-6 rounded-full border border-foreground">
+                                <AvatarImage src="https://github.com/shadcn.png" />
+                                <AvatarFallback>{currentChatUser!.name.split(" ").map((w) => w.slice(0, 1)).join("")}</AvatarFallback>
+                            </Avatar>
+                            {currentChatUser!.name}
                         </div>
+                    </div>
                 }
                 <IoClose
-                    onClick={() => setOpenChatWindow(false)}
+                    onClick={() => {
+                        setOpenChatWindow(false);
+                        setCurrentChatUser(null);
+                    }}
                     className="size-7 p-1 rounded-full hover:bg-foreground/20 cursor-pointer"
                 />
             </div>
 
             {currentChatUser ?
-                <UserChat currentChatUser={currentChatUser} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} /> : <UserChatList remoteUsers={remoteUsers} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} />
+                <UserChat currentChatUser={currentChatUser} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} sendChatMessage={sendChatMessage} /> : <UserChatList remoteUsers={remoteUsers} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} />
             }
 
         </motion.div>

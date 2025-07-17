@@ -243,8 +243,6 @@ export class Arena {
     }
 
     private sendHelloMessage = () => {
-
-
         if (!this.localUser) return;
         this.socket.send(JSON.stringify({
             type: 'hello',
@@ -263,6 +261,8 @@ export class Arena {
         const recievedData = JSON.parse(event.data);
         if (recievedData.type === 'hello') {
             const data = recievedData.data;
+
+            if(this.otherUsers.find(user=>user.userId === data.userId)) return;
 
             const screenX = data.posX;
             const screenY = data.posY;
@@ -291,6 +291,8 @@ export class Arena {
             }])
 
             console.log('created sprite')
+            // send hello back
+            this.sendHelloMessage();
         }
         else if (recievedData.type === 'user_update') {
             const senderId = recievedData.data.userId;

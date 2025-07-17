@@ -1,4 +1,13 @@
-import { z } from 'zod/v4';
+import * as z from "zod";
+import { ArenaRegions, ArenaRegionsEnum } from '../types/arena.types.js';
+
+export interface Arena {
+    id: string;
+    name: string;
+    region: ArenaRegions;
+    adminId: string;
+    createdAt: Date;
+}
 
 export const arenaSchema = z.object({
     id:z.int(),
@@ -11,12 +20,11 @@ export const arenaSchema = z.object({
     //chatgroups
     //users
 })
-export type Arena = z.infer<typeof arenaSchema>;
 
-export const ArenaRegionsEnum = z.enum(['office', 'garden']);
-export type ArenaRegions = z.infer<typeof ArenaRegionsEnum>;
-
-
+export const createArenaSchema = z.object({
+    arenaName: z.string().min(1, { error: "Arena name is required" }).max(50, { error: "Arena name cannot be more than 50 characters" }),
+    arenaRegion: ArenaRegionsEnum,
+});
 
 export const getUserArenasSchema = z.object({
     userArenas:z.array(arenaSchema),
