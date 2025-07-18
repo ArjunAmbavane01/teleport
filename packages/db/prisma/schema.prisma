@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Region {
+  office
+  garden
+}
+
 model User {
   id            String        @id @default(cuid())
   name          String?
@@ -60,13 +65,14 @@ model Arena {
   id         Int           @id @default(autoincrement())
   slug       String        @unique
   name       String
+  region     Region        @default(office)
   adminId    String
   messages   ChatMessage[] // all messages of this arena
   chatGroups ChatGroup[] // all chat groups of this arena
   users      User[]        @relation("ArenaUsers") // all users if this arena
 
   createdAt DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   admin User @relation("ArenaAdmin", fields: [adminId], references: [id]) // admin
 }
