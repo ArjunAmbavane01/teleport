@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth/requireAuth'
+import { getUserOrRedirect } from '@/lib/auth/getUserOrRedirect'
 import { getArenaIdFromSlug } from '@/actions/arenaActions';
 import { createWsToken } from '@workspace/common/utils/jwt';
 import ArenaWrapper from './_components/ArenaWrapper';
@@ -6,7 +6,7 @@ import ArenaWrapper from './_components/ArenaWrapper';
 interface PageProps { params: Promise<{ slug: string }> }
 
 const Page: React.FC<PageProps> = async ({ params }: PageProps) => {
-  const user = await requireAuth();
+  const user = await getUserOrRedirect();
   const { slug } = await params;
   const res = await getArenaIdFromSlug(slug);
   if (!res) return <div>Arena not found</div>

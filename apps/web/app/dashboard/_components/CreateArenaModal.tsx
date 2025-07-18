@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
-import CloseModalBtn from '@/components/buttons/CloseModal';
+import CloseModalBtn from '@/components/buttons/CloseModalBtn';
 import CreateArenaForm from './CreateArenaForm';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 

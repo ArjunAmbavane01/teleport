@@ -1,4 +1,4 @@
-import GetTeleportedBtn from "@/components/buttons/GetTeleported";
+import GetTeleportedBtn from "@/components/buttons/GetTeleportedBtn";
 
 const HeroSection: React.FC = () => {
     return (

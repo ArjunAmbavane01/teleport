@@ -1,17 +1,17 @@
 "use client"
 
 import { FocusEvent, useState } from 'react';
-import { useForm } from "react-hook-form";
+import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { Form } from '@workspace/ui/components/form';
-import { ArenaRegionsEnum } from '@workspace/common/schemas/arena.schema';
-import { createArenaSchema, CreateArenaInput  } from '@workspace/common/schemas/createArena.schema';
+import { CreateArenaInput } from '@workspace/common/types/arena.types';
 import { Button } from '@workspace/ui/components/button';
+import { ArenaRegionsEnum, createArenaSchema } from '@workspace/common/schemas/arena.schema';
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CreateArenaFormField } from './CreateArenaFormField';
-import { toast } from 'sonner';
-import { CgSpinner } from 'react-icons/cg';
 import { createNewArena } from '@/actions/arenaActions';
+import { toast } from 'sonner';
+import { CreateArenaFormField } from './CreateArenaFormField';
+import { CgSpinner } from 'react-icons/cg';
 
 const CreateArenaForm: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -27,15 +27,15 @@ const CreateArenaForm: React.FC = () => {
     const submitForm = async (values: CreateArenaInput) => {
         setIsSubmitting(true);
         try {
-            const { message, type, data, error } = await createNewArena(values);
-            if (type === "error") {
-                console.error(error);
-                toast.error(message, {
+            const res = await createNewArena(values);
+            if (res.type === "error") {
+                console.error(res.error);
+                toast.error(res.message, {
                     richColors: true
                 })
             } else {
-                const { arenaSlug } = data as { arenaSlug: string };
-                toast.success(message, {
+                const { arenaSlug } = res.data as { arenaSlug: string };
+                toast.success(res.message, {
                     richColors: true
                 })
                 router.push(`/arena/${arenaSlug}`);

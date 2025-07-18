@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import Arena from './Arena'
 import { BASE_WS_URL } from '@/lib/api/endPoints';
+import Arena from './Arena'
 
 interface ArenaWrapperProps {
     wsToken: string | undefined;

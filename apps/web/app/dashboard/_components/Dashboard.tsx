@@ -1,8 +1,13 @@
 import { Suspense } from "react";
-import OpenNewArenaModalBtn from "@/components/buttons/OpenNewArenaModal";
+import { User } from "next-auth";
+import OpenNewArenaModalBtn from "@/components/buttons/OpenNewArenaModalBtn";
 import ArenasList from "./ArenasList";
 
-const Dashboard: React.FC = () => {
+interface DashboardProps {
+    user: User;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ user }: DashboardProps) => {
     return (
         <div className="flex flex-col gap-20 p-10 mx-auto max-w-8xl w-full h-screen relative">
             <div className="flex items-center gap-10">
@@ -13,7 +18,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
                 <Suspense fallback={<div>Loading Arenas</div>}>
-                    <ArenasList />
+                    <ArenasList user={user} />
                 </Suspense>
             </div>
         </div>

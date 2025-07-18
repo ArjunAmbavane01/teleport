@@ -12,4 +12,4 @@ const Arena:React.FC<ArenaProps> = ({ socket }: ArenaProps) => {
     )
 }
 
-export default Arena
+export default Arena;

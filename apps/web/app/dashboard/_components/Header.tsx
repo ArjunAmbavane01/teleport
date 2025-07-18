@@ -1,5 +1,5 @@
 import { User } from "next-auth";
-import SignOutButton from "@/components/buttons/SignOut";
+import SignOutButton from "@/components/buttons/SignOutBtn";
 
 interface HeaderProps {
     user: User;

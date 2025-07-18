@@ -1,11 +1,11 @@
 "use server"
 
-import { prisma } from "@workspace/db";
+import { Arena, prisma } from "@workspace/db";
 import generateArenaSlug from "@workspace/common/utils/slug";
-import { createArenaSchema, CreateArenaInput, createArenaResponse, } from '@workspace/common/schemas/createArena.schema';
 import { auth } from "@/app/api/auth/[...nextauth]/options";
 import { revalidatePath } from "next/cache";
-import { Arena } from "@workspace/common/schemas/arena.schema";
+import { CreateArenaInput, createArenaResponse } from "@workspace/common/types/arena.types";
+import { createArenaSchema } from "@workspace/common/schemas/arena.schema";
 
 export const createNewArena = async (values: CreateArenaInput): Promise<createArenaResponse> => {
     try {
