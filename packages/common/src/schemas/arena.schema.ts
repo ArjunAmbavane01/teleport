@@ -1,18 +1,12 @@
-import * as z from "zod";
-import { ArenaRegions, ArenaRegionsEnum } from '../types/arena.types.js';
+import * as z from "zod/v3";
 
-export interface Arena {
-    id: string;
-    name: string;
-    region: ArenaRegions;
-    adminId: string;
-    createdAt: Date;
-}
+export const ArenaRegionsEnum = z.enum(['office', 'garden']);
 
 export const arenaSchema = z.object({
-    id:z.int(),
-    slug:z.string(),
-    name:z.string().min(1).max(50),
+    id: z.number(),
+    slug: z.string(),
+    name: z.string().min(1).max(50),
+    region: ArenaRegionsEnum,
     adminId: z.string(),
     createdAt: z.date(),
     updatedAt: z.date(),
@@ -22,10 +16,10 @@ export const arenaSchema = z.object({
 })
 
 export const createArenaSchema = z.object({
-    arenaName: z.string().min(1, { error: "Arena name is required" }).max(50, { error: "Arena name cannot be more than 50 characters" }),
+    arenaName: z.string().min(1, { message: "Arena name is required" }).max(50, { message: "Arena name cannot be more than 50 characters" }),
     arenaRegion: ArenaRegionsEnum,
 });
 
 export const getUserArenasSchema = z.object({
-    userArenas:z.array(arenaSchema),
+    userArenas: z.array(arenaSchema),
 })
