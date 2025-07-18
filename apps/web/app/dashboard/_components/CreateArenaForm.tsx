@@ -4,14 +4,14 @@ import { FocusEvent, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { Form } from '@workspace/ui/components/form';
-import { CreateArenaInput } from '@workspace/common/types/arena.types';
 import { Button } from '@workspace/ui/components/button';
-import { ArenaRegionsEnum, createArenaSchema } from '@workspace/common/schemas/arena.schema';
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createNewArena } from '@/actions/arenaActions';
 import { toast } from 'sonner';
 import { CreateArenaFormField } from './CreateArenaFormField';
 import { CgSpinner } from 'react-icons/cg';
+import { CreateArenaInput } from '@workspace/common/types';
+import { ArenaRegionsEnum, createArenaSchema } from '@workspace/common/schemas/arena.schema';
 
 const CreateArenaForm: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);

@@ -4,11 +4,14 @@ import { Boundary } from "./Boundary";
 import { rectangularCollision } from "./utils/collision";
 import { COLLISION_MAP } from "./utils/CollisionMap";
 import { loadImage } from "./utils/image";
-import { ArenaCallbacks, Direction, Movables, otherUser, RemoteUser, SpriteCharacter, SpriteImages, spriteImageSources, userProximity } from "./types";
+import { ArenaCallbacks, Movables, otherUser, RemoteUser, SpriteImages, spriteImageSources, userProximity } from "./types";
 import { Keys, ARENA_OFFSET_X, ARENA_OFFSET_Y, MOVE_SPEED, COLLISION_BLOCK_ID, keyDirs, keyToDirection, SPRITE_WIDTH, SPRITE_HEIGHT, FRAMES_PER_DIRECTION } from "./ArenaConstants";
 import { isWithinProximity } from "./utils/proximity";
 import { Dispatch, SetStateAction } from "react";
 import { areArraysSame, frameDebounce } from "./utils/helper";
+import { Direction, SpriteCharacter } from "@workspace/common/types";
+import { websocketIncomingMessage } from "@workspace/common/schemas";
+
 
 export class Arena {
 
@@ -35,6 +38,7 @@ export class Arena {
     private lastDirectionKey: string | '' = '';
     private keys: typeof Keys = Keys;
     private isUserMoving: boolean = false;
+    private isUserTalking: boolean = false;
     private userDirection: Direction = 'up';
 
     private setUserIdsInProximity: Dispatch<SetStateAction<string[]>>;
@@ -91,7 +95,7 @@ export class Arena {
         this.keys[key as keyof typeof this.keys].pressed = true;
         this.lastDirectionKey = key;
 
-        // i think here also add isUserTalking to skip this setting of isUserMoving
+        if (this.isUserTalking) return;
         this.isUserMoving = true;
 
         if (key in keyToDirection) this.userDirection = keyToDirection[key] as Direction;
@@ -109,7 +113,6 @@ export class Arena {
         if (!this.localUser) return;
         this.localUser.render(this.isUserMoving, this.userDirection, this.ctx);
 
-        if (this.foregroundMap) this.foregroundMap.render(this.ctx);
 
         if (this.otherUsers.length !== 0) {
             this.otherUsers.forEach(user => {
@@ -126,8 +129,10 @@ export class Arena {
                 }
             })
         }
+        if (this.foregroundMap) this.foregroundMap.render(this.ctx);
 
-        // check if proximity users have changed
+
+        // check if proximity users list have changed
         this.debouncedCheckProximityUsersChange();
 
         // else this.proximityChatTriggerOff();
@@ -139,6 +144,7 @@ export class Arena {
         // also set isUserMoving to false
         // and have if(isTalking) return 
 
+        if (this.isUserTalking) return;
 
         let canSpriteMove: boolean = true;
         if (this.keys.w.pressed && this.lastDirectionKey === 'w') {
@@ -199,8 +205,8 @@ export class Arena {
     private debouncedCheckProximityUsersChange = frameDebounce(() => {
         if (!areArraysSame(this.currentProximityUserIds, this.previousProximityUserIds)) {
             this.previousProximityUserIds = [...this.currentProximityUserIds];
-            this.setUserIdsInProximity((prevUserIds)=>{
-                if(!areArraysSame(prevUserIds,this.currentProximityUserIds)) return [...this.currentProximityUserIds];
+            this.setUserIdsInProximity((prevUserIds) => {
+                if (!areArraysSame(prevUserIds, this.currentProximityUserIds)) return [...this.currentProximityUserIds];
                 return [...prevUserIds];
             });
         }
@@ -218,7 +224,6 @@ export class Arena {
             const src = spriteImageSources[character];
             this.spriteImages[character] = await loadImage(src);
         }
-
 
         this.localUser = new Sprite(this.centerX, this.centerY, SPRITE_WIDTH, SPRITE_HEIGHT, FRAMES_PER_DIRECTION, this.spriteImages[this.spriteCharacter]);
         this.foregroundMap = new ForegroundMap(ARENA_OFFSET_X, ARENA_OFFSET_Y, this.arenaWidth, this.arenaHeight, foregroundImage)
@@ -245,12 +250,12 @@ export class Arena {
     private sendHelloMessage = () => {
         if (!this.localUser) return;
         this.socket.send(JSON.stringify({
-            type: 'hello',
+            type: 'hello_user',
             data: {
                 name: this.username,
+                character: this.spriteCharacter,
                 posX: this.localUser.posX,
                 posY: this.localUser.posY,
-                character: this.spriteCharacter,
                 isUserMoving: this.isUserMoving,
                 userDirection: this.userDirection
             }
@@ -258,11 +263,17 @@ export class Arena {
     }
 
     private handleMessage = (event: MessageEvent) => {
-        const recievedData = JSON.parse(event.data);
-        if (recievedData.type === 'hello') {
+        const parsedData = JSON.parse(event.data);
+        const result = websocketIncomingMessage.safeParse(parsedData);
+        if (result.error) {
+            console.error('Invalid Message Format :', result.error.message);
+            return;
+        }
+        const recievedData = result.data;
+        if (recievedData.type === 'hello_user') {
             const data = recievedData.data;
 
-            if(this.otherUsers.find(user=>user.userId === data.userId)) return;
+            if (this.otherUsers.find(user => user.userId === data.userId)) return;
 
             const screenX = data.posX;
             const screenY = data.posY;
@@ -311,6 +322,11 @@ export class Arena {
         window.addEventListener('keydown', this.handleMove);
         window.addEventListener('keyup', this.handleKeyUp);
         this.socket.addEventListener('message', this.handleMessage);
+    }
+
+    setIsUserTalking = (value: boolean) => {
+        console.log('talking')
+        this.isUserTalking = value;
     }
 
     destroy() {

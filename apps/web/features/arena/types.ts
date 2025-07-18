@@ -3,12 +3,11 @@ import { ForegroundMap } from "./Foreground";
 import { Arena } from "./ArenaEngine";
 import { Sprite } from "./Sprite";
 import { Dispatch, SetStateAction } from "react";
+import { Direction, SpriteCharacter } from "@workspace/common/types";
 
 export type Movables = (Arena | ForegroundMap | Boundary | otherUser)[];
 
 export type Rect = { posX: number; posY: number; width: number; height: number };
-
-export type Direction = 'up' | 'down' | 'left' | 'right';
 
 export interface otherUser {
     sprite: Sprite;
@@ -40,8 +39,6 @@ export interface userProximity {
 }
 
 export type SpriteImages = Record<SpriteCharacter, HTMLImageElement>;
-export type SpriteCharacter = 'alex' | 'bob';
-
 export type ArenaCallbacks = {
     setUserIdsInProximity: Dispatch<SetStateAction<string[]>>,
     setRemoteUsers: Dispatch<SetStateAction<RemoteUser[]>>,

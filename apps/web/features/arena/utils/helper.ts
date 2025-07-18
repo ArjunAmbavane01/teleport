@@ -1,5 +1,4 @@
-import { useEffect, useRef } from "react";
-import { Direction } from "../types";
+import { Direction } from "@workspace/common/types";
 
 export const getDirectionRow = (direction: Direction): number => {
     switch (direction) {

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from "@workspace/common/config";
-import { JWTPayload } from "@workspace/common/types/jwt.types";
+import { JWTPayload } from '@workspace/common/types';
 import { IUser } from "../index.js";
 
 export const validateToken = (token: string | null, users: IUser[]) => {

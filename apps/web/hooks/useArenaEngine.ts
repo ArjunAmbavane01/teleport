@@ -1,8 +1,12 @@
 import { Arena } from '@/features/arena/ArenaEngine';
-import { ArenaCallbacks, SpriteCharacter } from '@/features/arena/types';
-import { RefObject, useEffect } from 'react'
+import { ArenaCallbacks } from '@/features/arena/types';
+import { SpriteCharacter } from '@workspace/common/types';
+import { RefObject, useEffect, useState } from 'react'
 
 const useArenaEngine = (canvasRef: RefObject<HTMLCanvasElement | null>, ctxRef: RefObject<CanvasRenderingContext2D | null>, socket: WebSocket, callbacks: ArenaCallbacks) => {
+
+    const [setIsUserTalking, setSetter] = useState<((val: boolean) => void) | null>(null);
+
     useEffect(() => {
 
         if (!canvasRef.current) return;
@@ -22,17 +26,16 @@ const useArenaEngine = (canvasRef: RefObject<HTMLCanvasElement | null>, ctxRef: 
         let arena: Arena | null;
         const character: SpriteCharacter = 'alex';
         const username: string = 'Arjun';
-        const createArena = async () => {
-            arena = new Arena(canvas, ctx, socket, username, character, callbacks);
-            console.log('created')
-            return arena.destroy;
-        }
-        createArena();
+
+        arena = new Arena(canvas, ctx, socket, username, character, callbacks);
+        setSetter(() => arena!.setIsUserTalking);
 
         return () => {
             if (arena) arena.destroy();
         }
     }, [canvasRef, ctxRef, socket]);
+
+    return {setIsUserTalking};
 }
 
-export default useArenaEngine
+export default useArenaEngine;

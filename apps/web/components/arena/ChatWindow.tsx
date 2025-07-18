@@ -15,9 +15,10 @@ interface ChatWindowProps {
     setCurrentChatUser: Dispatch<SetStateAction<RemoteUser | null>>;
     setOpenChatWindow: Dispatch<SetStateAction<boolean>>;
     sendChatMessage: (message: string) => void;
+    setIsUserTalking: (value: boolean) => void;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ remoteUsers, currentChatUser, setCurrentChatUser, setOpenChatWindow, sendChatMessage }: ChatWindowProps) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ remoteUsers, currentChatUser, setCurrentChatUser, setOpenChatWindow, sendChatMessage,setIsUserTalking }: ChatWindowProps) => {
     return (
         <motion.div
             initial={{ x: 40, opacity: 0 }}
@@ -52,7 +53,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ remoteUsers, currentChatUser, s
             </div>
 
             {currentChatUser ?
-                <UserChat currentChatUser={currentChatUser} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} sendChatMessage={sendChatMessage} /> : <UserChatList remoteUsers={remoteUsers} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} />
+                <UserChat currentChatUser={currentChatUser} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} sendChatMessage={sendChatMessage} setIsUserTalking={setIsUserTalking} /> : <UserChatList remoteUsers={remoteUsers} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} />
             }
 
         </motion.div>

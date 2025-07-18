@@ -1,6 +1,8 @@
+"use server"
+
 import { sign } from "jsonwebtoken"
-import dotenv from 'dotenv';
 import { JWT_SECRET } from "../config.js";
+import dotenv from 'dotenv';
 dotenv.config();
 
 export const createWsToken = (userId: string,arenaId:number): string | undefined => {

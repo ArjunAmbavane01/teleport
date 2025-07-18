@@ -57,7 +57,7 @@ const ArenaMap: React.FC<ArenaMapProps> = ({ socket }: ArenaMapProps) => {
         setRemoteUsers,
     }), [setRemoteUsers, setUserIdsInProximity]);
 
-    useArenaEngine(canvasRef, ctxRef, socket, callbacks);
+    const {setIsUserTalking} = useArenaEngine(canvasRef, ctxRef, socket, callbacks);
 
     return <div className="relative w-screen h-screen">
         <div className="absolute top-8 left-[50%] -translate-x-[50%] flex items-start gap-5">
@@ -70,7 +70,7 @@ const ArenaMap: React.FC<ArenaMapProps> = ({ socket }: ArenaMapProps) => {
             </AnimatePresence>
         </div>
         <AnimatePresence>
-            {openChatWindow && <ChatWindow remoteUsers={remoteUsers} currentChatUser={currentChatUser} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} sendChatMessage={sendChatMessage} />}
+            {openChatWindow && setIsUserTalking && <ChatWindow remoteUsers={remoteUsers} currentChatUser={currentChatUser} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} sendChatMessage={sendChatMessage} setIsUserTalking={setIsUserTalking} />}
         </AnimatePresence>
 
         <BottomMenu setOpenChatWindow={setOpenChatWindow} setCurrentChatUser={setCurrentChatUser} />

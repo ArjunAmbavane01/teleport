@@ -3,7 +3,7 @@ import { Input } from '@workspace/ui/components/input';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 import { Control, FieldPath } from "react-hook-form";
-import { CreateArenaInput } from '@workspace/common/schemas/createArena.schema';
+import { CreateArenaInput } from '@workspace/common/types';
 
 interface CreateArenaFormFieldProps {
     name: FieldPath<CreateArenaInput>;

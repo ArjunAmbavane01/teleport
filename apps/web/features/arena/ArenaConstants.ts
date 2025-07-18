@@ -1,4 +1,4 @@
-import { Direction } from "./types";
+import { Direction } from "@workspace/common/types";
 
 export const TILE_SIZE = 16;
 export const ARENA_ZOOM = 1.35;

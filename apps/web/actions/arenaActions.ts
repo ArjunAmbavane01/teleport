@@ -1,10 +1,10 @@
 "use server"
 
+import { revalidatePath } from "next/cache";
 import { Arena, prisma } from "@workspace/db";
 import generateArenaSlug from "@workspace/common/utils/slug";
 import { auth } from "@/app/api/auth/[...nextauth]/options";
-import { revalidatePath } from "next/cache";
-import { CreateArenaInput, createArenaResponse } from "@workspace/common/types/arena.types";
+import { CreateArenaInput, createArenaResponse } from "@workspace/common/types";
 import { createArenaSchema } from "@workspace/common/schemas/arena.schema";
 
 export const createNewArena = async (values: CreateArenaInput): Promise<createArenaResponse> => {
@@ -31,7 +31,7 @@ export const createNewArena = async (values: CreateArenaInput): Promise<createAr
                     }
                 }
             })
-            revalidatePath('/dashboard')
+            revalidatePath('/dashboard');
             return {
                 type: 'success',
                 message: 'Arena created successfully!',

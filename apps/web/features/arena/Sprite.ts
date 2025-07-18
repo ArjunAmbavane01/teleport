@@ -1,4 +1,4 @@
-import { Direction } from "./types";
+import { Direction } from "@workspace/common/types";
 import { getDirectionRow } from "./utils/helper";
 
 export class Sprite {

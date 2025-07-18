@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build":"tsc -b",
-    "start":"node dist/index",
-    "dev":"pnpm run build && pnpm run start"
+    "build": "tsc -b",
+    "start": "node dist/index",
+    "dev": "pnpm run build && pnpm run start"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +18,8 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "ws": "^8.18.2"
+    "ws": "^8.18.2",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@workspace/typescript-config": "workspace:*",

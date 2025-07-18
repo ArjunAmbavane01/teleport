@@ -8,3 +8,8 @@ export type ArenaRegions = z.infer<typeof ArenaRegionsEnum>;
 export type CreateArenaInput = z.infer<typeof createArenaSchema>;
 export type createArenaResponse = z.infer<typeof createArenaResponse>;
 
+export const spriteEnum = z.enum(['alex', 'bob']);
+export type SpriteCharacter = z.infer<typeof spriteEnum>;
+export const directionEnum = z.enum(['up', 'down', 'left', 'right']);
+export type Direction = z.infer<typeof directionEnum>;
+

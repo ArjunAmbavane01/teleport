@@ -1,8 +1,9 @@
 import 'dotenv/config'
+import WebSocket, { WebSocketServer } from 'ws';
 import express, { Application, Request, Response } from 'express';
 import http, { IncomingMessage } from 'http';
-import WebSocket, { WebSocketServer } from 'ws';
 import { validateToken } from './utils/auth.js';
+import { websocketMessage } from "@workspace/common/schemas";
 
 export interface IUser {
     ws: WebSocket;
@@ -62,8 +63,18 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
     ws.on('message', async (data,) => {
         try {
             const parsedData = typeof data === 'string' ? JSON.parse(data) : JSON.parse(data.toString());
-            if (parsedData.type === 'join_arena') {
-                console.log('joined')
+            const result = websocketMessage.safeParse(parsedData);
+            if (result.error) {
+                const errorMessage = `Invalid message format: ${result.error.message}`;
+                console.error('WebSocket message validation failed:', result.error);
+                ws.send(JSON.stringify({
+                    type: 'error',
+                    message: errorMessage
+                }));
+                return;
+            }
+            const recievedData = result.data;
+            if (recievedData.type === 'join_arena') {
                 users.forEach((user) => {
                     if (user.arenas.includes(arenaId) && user.userId !== userId) {
                         user.ws.send(JSON.stringify({
@@ -73,24 +84,23 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
                     }
                 })
             }
-            else if (parsedData.type === 'hello') {
-                console.log('HELLO')
+            else if (recievedData.type === 'hello_user') {
                 users.forEach((user) => {
                     if (user.arenas.includes(arenaId) && user.userId !== userId) {
                         const newMessage = {
                             type: 'hello',
-                            data: { ...parsedData.data, userId }
+                            data: { ...recievedData.data, userId }
                         }
                         user.ws.send(JSON.stringify(newMessage))
                     }
                 })
             }
-            else if (parsedData.type === 'user_update') {
+            else if (recievedData.type === 'user_update') {
                 users.forEach((user) => {
                     if (user.arenas.includes(arenaId) && user.userId !== userId) {
                         const newMessage = {
                             type: 'user_update',
-                            data: { ...parsedData.data, userId }
+                            data: { ...recievedData.data, userId }
                         }
                         user.ws.send(JSON.stringify(newMessage))
                     }
