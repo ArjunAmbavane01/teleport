@@ -3,7 +3,8 @@ import WebSocket, { WebSocketServer } from 'ws';
 import express, { Application, Request, Response } from 'express';
 import http, { IncomingMessage } from 'http';
 import { validateToken } from './utils/auth.js';
-import { websocketMessage } from "@workspace/common/schemas";
+import { clientWsMessage } from "@workspace/common/schemas";
+import { prisma } from '@workspace/db';
 
 export interface IUser {
     ws: WebSocket;
@@ -37,6 +38,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
 
     const params = new URLSearchParams(reqURL.split("?")[1]);
     const token = params.get('token');
+    // validates and returns the user from users array if present
     const res = validateToken(token, users);
 
     if (res.type === "error") {
@@ -63,7 +65,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
     ws.on('message', async (data,) => {
         try {
             const parsedData = typeof data === 'string' ? JSON.parse(data) : JSON.parse(data.toString());
-            const result = websocketMessage.safeParse(parsedData);
+            const result = clientWsMessage.safeParse(parsedData);
             if (result.error) {
                 const errorMessage = `Invalid message format: ${result.error.message}`;
                 console.error('WebSocket message validation failed:', result.error);
@@ -74,37 +76,77 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
                 return;
             }
             const recievedData = result.data;
-            if (recievedData.type === 'join_arena') {
-                users.forEach((user) => {
-                    if (user.arenas.includes(arenaId) && user.userId !== userId) {
-                        user.ws.send(JSON.stringify({
-                            type: 'user_joined',
-                            userId,
-                        }))
-                    }
-                })
-            }
-            else if (recievedData.type === 'hello_user') {
+            if (recievedData.type === 'hello') {
                 users.forEach((user) => {
                     if (user.arenas.includes(arenaId) && user.userId !== userId) {
                         const newMessage = {
                             type: 'hello',
-                            data: { ...recievedData.data, userId }
+                            data: { ...recievedData.data, senderId: userId }
                         }
                         user.ws.send(JSON.stringify(newMessage))
                     }
                 })
-            }
-            else if (recievedData.type === 'user_update') {
+            } else if (recievedData.type === 'user_update') {
                 users.forEach((user) => {
                     if (user.arenas.includes(arenaId) && user.userId !== userId) {
                         const newMessage = {
                             type: 'user_update',
-                            data: { ...recievedData.data, userId }
+                            data: { ...recievedData.data, senderId: userId }
                         }
                         user.ws.send(JSON.stringify(newMessage))
                     }
                 })
+            } else if (recievedData.type === 'chat') {
+                const { content, recipientId, sentAt } = recievedData.data;
+                const groupId1 = `${userId}-${recipientId}`;
+                const groupId2 = `${recipientId}-${userId}`;
+                let groupId;
+                const group = await prisma.chatGroup.findFirst({
+                    where: {
+                        id: { in: [groupId1, groupId2] }
+                    }
+                });
+                if (group) groupId = group.id;
+                else {
+                    const res = await prisma.chatGroup.create({
+                        data: {
+                            id: groupId1,
+                            arenaId,
+                            type: 'dm',
+                            users: {
+                                connect: [
+                                    { id: userId },
+                                    { id: recipientId }
+                                ]
+                            }
+                        }
+                    })
+                    groupId = res.id
+                }
+
+                // add chat to chatgroup and chat table
+                const message = await prisma.chatMessage.create({
+                    data: {
+                        content,
+                        senderId: userId,
+                        groupId,
+                        arenaId: arenaId,
+                        createdAt: sentAt,
+                    }
+                })
+                const newMessage = {
+                    type: 'chat',
+                    recipientId,
+                    data: message
+                }
+                ws.send(JSON.stringify(newMessage));
+                for (let i = 0; i <= users.length; i++) {
+                    const user = users[i] as IUser;
+                    if (user.userId === recievedData.data.recipientId) {
+                        user.ws.send(JSON.stringify(newMessage));
+                        break;
+                    }
+                }
             }
         } catch (e) {
             console.error('Some error occurred ', e);

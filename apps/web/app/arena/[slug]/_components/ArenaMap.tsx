@@ -1,18 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArenaCallbacks, RemoteUser } from "@/features/arena/types";
+import { ArenaCallbacks, ChatMessagesMap, RemoteUser } from "@/features/arena/types";
 import useArenaEngine from "@/hooks/useArenaEngine";
 import { AnimatePresence } from "motion/react";
 import ProximityUserCard from "@/components/arena/ProximityUserCard";
 import ChatWindow from "@/components/arena/ChatWindow";
 import BottomMenu from "./BottomMenu";
+import { receivedChatMessage } from "@workspace/common/types"
 
 interface ArenaMapProps {
     socket: WebSocket | null;
+    localUserID: string;
 }
 
-const ArenaMap: React.FC<ArenaMapProps> = ({ socket }: ArenaMapProps) => {
+const ArenaMap: React.FC<ArenaMapProps> = ({ socket, localUserID }: ArenaMapProps) => {
 
     if (!socket) return;
 
@@ -23,7 +25,8 @@ const ArenaMap: React.FC<ArenaMapProps> = ({ socket }: ArenaMapProps) => {
     const [remoteUsers, setRemoteUsers] = useState<RemoteUser[]>([]);
     const [currentChatUser, setCurrentChatUser] = useState<RemoteUser | null>(null);
     const [openChatWindow, setOpenChatWindow] = useState<boolean>(false);
-
+    const [chatMessages, setChatMessages] = useState<ChatMessagesMap>({});
+    
     useEffect(() => {
         const handleResize = () => {
             if (!canvasRef.current || !ctxRef.current) return;
@@ -43,21 +46,34 @@ const ArenaMap: React.FC<ArenaMapProps> = ({ socket }: ArenaMapProps) => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    const sendChatMessage = useCallback((message: string) => {
+    const sendChatMessage = useCallback((content: string) => {
         if (!currentChatUser) return;
         socket.send(JSON.stringify({
             type: 'chat',
-            userId: currentChatUser.userId,
-            message
+            data: {
+                recipientId: currentChatUser.userId,
+                sentAt: new Date().toISOString(),
+                content
+            }
+        }));
+    }, [currentChatUser]);
+
+    const handleIncomingMessage = useCallback((receivedData: receivedChatMessage) => {
+        const recipientId = receivedData.recipientId;
+        const { senderId } = receivedData.data;
+        const userId = senderId === localUserID ? recipientId : senderId;
+        setChatMessages((prev) => ({
+            ...prev, [userId]: [...(prev[userId] || []), receivedData.data]
         }))
-    }, []);
+    }, [localUserID]);
 
     const callbacks: ArenaCallbacks = useMemo(() => ({
         setUserIdsInProximity,
         setRemoteUsers,
-    }), [setRemoteUsers, setUserIdsInProximity]);
+        handleIncomingMessage
+    }), [setRemoteUsers, setUserIdsInProximity, handleIncomingMessage]);
 
-    const {setIsUserTalking} = useArenaEngine(canvasRef, ctxRef, socket, callbacks);
+    const { setIsUserTalking } = useArenaEngine(canvasRef, ctxRef, socket, callbacks);
 
     return <div className="relative w-screen h-screen">
         <div className="absolute top-8 left-[50%] -translate-x-[50%] flex items-start gap-5">
@@ -70,7 +86,8 @@ const ArenaMap: React.FC<ArenaMapProps> = ({ socket }: ArenaMapProps) => {
             </AnimatePresence>
         </div>
         <AnimatePresence>
-            {openChatWindow && setIsUserTalking && <ChatWindow remoteUsers={remoteUsers} currentChatUser={currentChatUser} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} sendChatMessage={sendChatMessage} setIsUserTalking={setIsUserTalking} />}
+            {openChatWindow && setIsUserTalking &&
+                <ChatWindow localUserID={localUserID} remoteUsers={remoteUsers} currentChatUser={currentChatUser} chatMessages={chatMessages} sendChatMessage={sendChatMessage} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} setIsUserTalking={setIsUserTalking} />}
         </AnimatePresence>
 
         <BottomMenu setOpenChatWindow={setOpenChatWindow} setCurrentChatUser={setCurrentChatUser} />

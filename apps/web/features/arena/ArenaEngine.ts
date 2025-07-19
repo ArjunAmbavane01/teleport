@@ -4,13 +4,13 @@ import { Boundary } from "./Boundary";
 import { rectangularCollision } from "./utils/collision";
 import { COLLISION_MAP } from "./utils/CollisionMap";
 import { loadImage } from "./utils/image";
-import { ArenaCallbacks, Movables, otherUser, RemoteUser, SpriteImages, spriteImageSources, userProximity } from "./types";
-import { Keys, ARENA_OFFSET_X, ARENA_OFFSET_Y, MOVE_SPEED, COLLISION_BLOCK_ID, keyDirs, keyToDirection, SPRITE_WIDTH, SPRITE_HEIGHT, FRAMES_PER_DIRECTION } from "./ArenaConstants";
+import { ArenaCallbacks, Movables, otherUser, RemoteUser, SpriteImages, spriteImageSources } from "./types";
+import { Keys, ARENA_OFFSET_X, ARENA_OFFSET_Y, MOVE_SPEED, COLLISION_BLOCK_ID, keyDirs, keyToDirection, SPRITE_WIDTH, SPRITE_HEIGHT, FRAMES_PER_DIRECTION, ARENA_MAP_IMAGE_URL, FOREGROUND_MAP_IMAGE_URL } from "./ArenaConstants";
 import { isWithinProximity } from "./utils/proximity";
 import { Dispatch, SetStateAction } from "react";
 import { areArraysSame, frameDebounce } from "./utils/helper";
-import { Direction, SpriteCharacter } from "@workspace/common/types";
-import { websocketIncomingMessage } from "@workspace/common/schemas";
+import { Direction, receivedChatMessage, SpriteCharacter } from "@workspace/common/types";
+import { serverWsMessage } from "@workspace/common/schemas";
 
 
 export class Arena {
@@ -43,6 +43,7 @@ export class Arena {
 
     private setUserIdsInProximity: Dispatch<SetStateAction<string[]>>;
     private setRemoteUsers: Dispatch<SetStateAction<RemoteUser[]>>;
+    private handleIncomingMessage: (receivedData: receivedChatMessage) => void;
 
 
     constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, socket: WebSocket, username: string, character: SpriteCharacter, callbacks: ArenaCallbacks) {
@@ -61,6 +62,7 @@ export class Arena {
 
         this.setUserIdsInProximity = callbacks.setUserIdsInProximity;
         this.setRemoteUsers = callbacks.setRemoteUsers;
+        this.handleIncomingMessage = callbacks.handleIncomingMessage;
 
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(0, 0, this.arenaWidth, this.arenaHeight);
@@ -132,17 +134,10 @@ export class Arena {
         if (this.foregroundMap) this.foregroundMap.render(this.ctx);
 
 
-        // check if proximity users list have changed
+        // check if proximity users list have changed since previous render
         this.debouncedCheckProximityUsersChange();
 
-        // else this.proximityChatTriggerOff();
-
         this.sendUserUpdate();
-
-        // check if any other user is near
-        // and if yes then set isTalking to true
-        // also set isUserMoving to false
-        // and have if(isTalking) return 
 
         if (this.isUserTalking) return;
 
@@ -202,6 +197,8 @@ export class Arena {
         }
     }
 
+
+    // debounce for every 10 frames
     private debouncedCheckProximityUsersChange = frameDebounce(() => {
         if (!areArraysSame(this.currentProximityUserIds, this.previousProximityUserIds)) {
             this.previousProximityUserIds = [...this.currentProximityUserIds];
@@ -214,11 +211,13 @@ export class Arena {
 
     private initAssets = async () => {
 
-        const arenaImageSrc: string = '/maps/arenaMap.png';
-        const foregroundImageSrc: string = '/maps/foregroundMap.png';
+        const arenaImageSrc: string = ARENA_MAP_IMAGE_URL;
+        const foregroundImageSrc: string = FOREGROUND_MAP_IMAGE_URL;
 
+        // load images for arena, foreground and all sprites
         this.arenaMapImage = await loadImage(arenaImageSrc);
         const foregroundImage = await loadImage(foregroundImageSrc);
+
         for (const key in spriteImageSources) {
             const character = key as SpriteCharacter;
             const src = spriteImageSources[character];
@@ -232,7 +231,6 @@ export class Arena {
         this.sendHelloMessage();
         this.render();
     }
-
 
     private sendUserUpdate = () => {
         if (!this.localUser) return;
@@ -250,7 +248,7 @@ export class Arena {
     private sendHelloMessage = () => {
         if (!this.localUser) return;
         this.socket.send(JSON.stringify({
-            type: 'hello_user',
+            type: 'hello',
             data: {
                 name: this.username,
                 character: this.spriteCharacter,
@@ -264,57 +262,51 @@ export class Arena {
 
     private handleMessage = (event: MessageEvent) => {
         const parsedData = JSON.parse(event.data);
-        const result = websocketIncomingMessage.safeParse(parsedData);
+        const result = serverWsMessage.safeParse(parsedData);
         if (result.error) {
             console.error('Invalid Message Format :', result.error.message);
             return;
         }
         const recievedData = result.data;
-        if (recievedData.type === 'hello_user') {
-            const data = recievedData.data;
+        if (recievedData.type === 'hello') {
+            if (this.otherUsers.find(user => user.userId === recievedData.data.senderId)) return;
 
-            if (this.otherUsers.find(user => user.userId === data.userId)) return;
+            const screenX = recievedData.data.posX;
+            const screenY = recievedData.data.posY;
 
-            const screenX = data.posX;
-            const screenY = data.posY;
-
-            const userSprite = new Sprite(screenX, screenY, SPRITE_WIDTH, SPRITE_HEIGHT, FRAMES_PER_DIRECTION, this.spriteImages[data.character as SpriteCharacter]);
+            const userSprite = new Sprite(screenX, screenY, SPRITE_WIDTH, SPRITE_HEIGHT, FRAMES_PER_DIRECTION, this.spriteImages[recievedData.data.character as SpriteCharacter]);
             const newUser: otherUser = {
                 sprite: userSprite,
-                userId: data.userId,
-                name: data.name,
-                posX: data.posX,
-                posY: data.posY,
-                character: data.character as SpriteCharacter,
-                isUserMoving: data.isUserMoving,
-                userDirection: data.userDirection
+                userId: recievedData.data.senderId,
+                name: recievedData.data.name,
+                posX: recievedData.data.posX,
+                posY: recievedData.data.posY,
+                character: recievedData.data.character as SpriteCharacter,
+                isUserMoving: recievedData.data.isUserMoving,
+                userDirection: recievedData.data.userDirection
             }
-
-            console.log('newUser  : ', newUser)
 
             this.otherUsers.push(newUser);
             this.setRemoteUsers((c) => [...c, {
                 name: newUser.name,
                 isOnline: true,
-                lastSeen: new Date(),
+                lastOnline: null,
                 spriteCharacter: newUser.character,
                 userId: newUser.userId
             }])
 
-            console.log('created sprite')
             // send hello back
             this.sendHelloMessage();
-        }
-        else if (recievedData.type === 'user_update') {
-            const senderId = recievedData.data.userId;
-            const user = this.otherUsers.find((user) => user.userId === senderId);
+        } else if (recievedData.type === 'user_update') {
+            const user = this.otherUsers.find((user) => user.userId === recievedData.data.senderId);
             if (user) {
-                const data = recievedData.data;
-                user.posX = data.posX;
-                user.posY = data.posY;
-                user.isUserMoving = data.isUserMoving;
-                user.userDirection = data.userDirection;
+                user.posX = recievedData.data.posX;
+                user.posY = recievedData.data.posY;
+                user.isUserMoving = recievedData.data.isUserMoving;
+                user.userDirection = recievedData.data.userDirection;
             }
+        } else if (recievedData.type === 'chat') {
+            this.handleIncomingMessage(recievedData);
         }
     }
 
@@ -325,7 +317,6 @@ export class Arena {
     }
 
     setIsUserTalking = (value: boolean) => {
-        console.log('talking')
         this.isUserTalking = value;
     }
 

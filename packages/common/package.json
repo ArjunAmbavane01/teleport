@@ -20,10 +20,10 @@
   "type": "module",
   "description": "",
   "devDependencies": {
+    "@workspace/typescript-config": "workspace:*",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.0.4",
-    "@types/slug": "^5.0.9",
-    "@workspace/typescript-config": "workspace:*"
+    "@types/slug": "^5.0.9"
   },
   "dependencies": {
     "dotenv": "^16.5.0",

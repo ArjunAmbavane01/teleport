@@ -1,24 +1,28 @@
 import { Dispatch, SetStateAction } from 'react'
 import { motion } from "motion/react";
 import UserChatList from './UserChatList';
-import { RemoteUser } from '@/features/arena/types';
+import { ChatMessagesMap, RemoteUser } from '@/features/arena/types';
 import UserChat from './UserChat';
 import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
 import { IoClose } from "react-icons/io5";
 import { IoIosArrowBack } from "react-icons/io";
+import { ChatMessage } from '@workspace/common/types';
 
 
 
 interface ChatWindowProps {
+    localUserID: string;
     remoteUsers: RemoteUser[];
     currentChatUser: RemoteUser | null;
+    chatMessages: ChatMessagesMap;
     setCurrentChatUser: Dispatch<SetStateAction<RemoteUser | null>>;
     setOpenChatWindow: Dispatch<SetStateAction<boolean>>;
     sendChatMessage: (message: string) => void;
     setIsUserTalking: (value: boolean) => void;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ remoteUsers, currentChatUser, setCurrentChatUser, setOpenChatWindow, sendChatMessage,setIsUserTalking }: ChatWindowProps) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ localUserID, remoteUsers, currentChatUser, setCurrentChatUser, setOpenChatWindow, sendChatMessage, setIsUserTalking, chatMessages }: ChatWindowProps) => {
+
     return (
         <motion.div
             initial={{ x: 40, opacity: 0 }}
@@ -27,8 +31,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ remoteUsers, currentChatUser, s
             transition={{ duration: 0.3 }}
             className="flex flex-col justify-start items-center gap-5 absolute inset-y-0 right-6 w-72 h-[70%] my-auto bg-background/95 rounded-lg border border-foreground">
             <div className='flex items-center justify-between gap-3 w-full p-3 border-b border-foreground text-foreground'>
-                {!currentChatUser ?
-                    (<span>Chat</span>) :
+                {currentChatUser ?
                     <div className='flex flex-1 justify-start items-center gap-3'>
                         <IoIosArrowBack
                             onClick={() => setCurrentChatUser(null)}
@@ -41,7 +44,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ remoteUsers, currentChatUser, s
                             </Avatar>
                             {currentChatUser!.name}
                         </div>
-                    </div>
+                    </div> :
+                    (<span>Chat</span>)
                 }
                 <IoClose
                     onClick={() => {
@@ -53,7 +57,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ remoteUsers, currentChatUser, s
             </div>
 
             {currentChatUser ?
-                <UserChat currentChatUser={currentChatUser} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} sendChatMessage={sendChatMessage} setIsUserTalking={setIsUserTalking} /> : <UserChatList remoteUsers={remoteUsers} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} />
+                <UserChat localUserID={localUserID} currentChatUser={currentChatUser} setCurrentChatUser={setCurrentChatUser}  sendChatMessage={sendChatMessage} setIsUserTalking={setIsUserTalking} chatMessages={chatMessages} /> : <UserChatList remoteUsers={remoteUsers} setCurrentChatUser={setCurrentChatUser} setOpenChatWindow={setOpenChatWindow} />
             }
 
         </motion.div>

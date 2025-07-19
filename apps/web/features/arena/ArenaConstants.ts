@@ -3,6 +3,9 @@ import { Direction } from "@workspace/common/types";
 export const TILE_SIZE = 16;
 export const ARENA_ZOOM = 1.35;
 
+export const ARENA_MAP_IMAGE_URL= "/maps/arenaMap.png";
+export const FOREGROUND_MAP_IMAGE_URL= "/maps/foregroundMap.png";
+
 export const ARENA_OFFSET_X = -150;
 export const ARENA_OFFSET_Y = -400;
 

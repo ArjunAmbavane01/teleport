@@ -3,7 +3,7 @@ import { ForegroundMap } from "./Foreground";
 import { Arena } from "./ArenaEngine";
 import { Sprite } from "./Sprite";
 import { Dispatch, SetStateAction } from "react";
-import { Direction, SpriteCharacter } from "@workspace/common/types";
+import { ChatMessage, Direction, receivedChatMessage, SpriteCharacter } from "@workspace/common/types";
 
 export type Movables = (Arena | ForegroundMap | Boundary | otherUser)[];
 
@@ -24,7 +24,7 @@ export interface RemoteUser {
     userId: string;
     name: string;
     isOnline: boolean;
-    lastSeen: Date;
+    lastOnline: Date | null;
     spriteCharacter: SpriteCharacter;
 }
 
@@ -42,4 +42,7 @@ export type SpriteImages = Record<SpriteCharacter, HTMLImageElement>;
 export type ArenaCallbacks = {
     setUserIdsInProximity: Dispatch<SetStateAction<string[]>>,
     setRemoteUsers: Dispatch<SetStateAction<RemoteUser[]>>,
+    handleIncomingMessage: (receivedData: receivedChatMessage) => void;
 }
+
+export type ChatMessagesMap = Record<string, ChatMessage[]>;

@@ -5,7 +5,7 @@ import { JWT_SECRET } from "../config.js";
 import dotenv from 'dotenv';
 dotenv.config();
 
-export const createWsToken = (userId: string,arenaId:number): string | undefined => {
+export const createWsToken = async (userId: string,arenaId:number): Promise<string | undefined> => {
     try {
         const token = sign({
             userId,
