@@ -1,5 +1,5 @@
 import { getUserOrRedirect } from '@/lib/auth/getUserOrRedirect'
-import { getArenaIdFromSlug } from '@/actions/arenaActions';
+import { getArenaIdFromSlug, getInitialChatMessages } from '@/actions/arenaActions';
 import { createWsToken } from '@workspace/common/utils/jwt';
 import ArenaWrapper from './_components/ArenaWrapper';
 import { prisma } from '@workspace/db';
@@ -15,9 +15,9 @@ const Page: React.FC<PageProps> = async ({ params }: PageProps) => {
   const wsToken = await createWsToken(user.id as string, arenaId);
   if (!wsToken) return <div>Some Internal Error Occurred</div>
 
-  const chatGroups = await prisma.user.findFirst({ where: { id: user.id }, select: { chatGroups: true } });
+  const initialChatMessages = await getInitialChatMessages(user);
   
-  return <ArenaWrapper wsToken={wsToken} userId={user.id as string} />
+  return <ArenaWrapper wsToken={wsToken} userId={user.id as string} initialChatMessages={initialChatMessages} />
 }
 
 export default Page;

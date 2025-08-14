@@ -12,9 +12,10 @@ import { receivedChatMessage } from "@workspace/common/types"
 interface ArenaMapProps {
     socket: WebSocket | null;
     localUserID: string;
+    initialChatMessages: ChatMessagesMap;
 }
 
-const ArenaMap: React.FC<ArenaMapProps> = ({ socket, localUserID }: ArenaMapProps) => {
+const ArenaMap: React.FC<ArenaMapProps> = ({ socket, localUserID, initialChatMessages }: ArenaMapProps) => {
 
     if (!socket) return;
 
@@ -25,8 +26,8 @@ const ArenaMap: React.FC<ArenaMapProps> = ({ socket, localUserID }: ArenaMapProp
     const [remoteUsers, setRemoteUsers] = useState<RemoteUser[]>([]);
     const [currentChatUser, setCurrentChatUser] = useState<RemoteUser | null>(null);
     const [openChatWindow, setOpenChatWindow] = useState<boolean>(false);
-    const [chatMessages, setChatMessages] = useState<ChatMessagesMap>({});
-    
+    const [chatMessages, setChatMessages] = useState<ChatMessagesMap>(initialChatMessages);
+
     useEffect(() => {
         const handleResize = () => {
             if (!canvasRef.current || !ctxRef.current) return;
